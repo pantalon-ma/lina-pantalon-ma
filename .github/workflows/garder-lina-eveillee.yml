@@ -1,9 +1,9 @@
 # Garde Lina éveillée sur Render (offre gratuite = mise en veille après 15 min sans visite).
-# Appel toutes les 14 minutes de 8h à minuit (heure du Maroc), pour rester sous les minutes gratuites de GitHub.
+# Appel toutes les 10 minutes de 7h à minuit (heure du Maroc). Dépôt public = minutes GitHub Actions illimitées.
 name: Garder Lina éveillée
 on:
   schedule:
-    - cron: "*/14 7-23 * * *"
+    - cron: "*/10 7-23 * * *"
   workflow_dispatch:
 jobs:
   ping:
