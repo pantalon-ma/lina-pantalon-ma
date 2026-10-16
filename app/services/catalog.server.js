@@ -1,4 +1,5 @@
 import prisma from "../db.server";
+import { shopDomainFor } from "./shop-origin.server";
 /**
  * Catalogue pantalon.ma — outil « rechercher_modeles »
  * Lit le catalogue via l'API Storefront publique de Shopify (sans jeton)
@@ -79,9 +80,7 @@ async function loadCatalog(shopOrigin) {
   if (hit && Date.now() - hit.at < CACHE_MS) return hit.products;
 
   // Domaine .myshopify.com (session de l'app) — l'origine peut être pantalon.ma
-  const session = await prisma.session.findFirst({ where: { shop: new URL(shopOrigin).hostname } })
-    || await prisma.session.findFirst();
-  const shopDomain = session?.shop || new URL(shopOrigin).hostname;
+  const shopDomain = shopDomainFor(new URL(shopOrigin).hostname);
   const token = await getStorefrontToken(shopDomain);
 
   const products = [];

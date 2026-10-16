@@ -5,7 +5,7 @@
 import MCPClient from "../mcp-client";
 import prisma, { saveMessage, getConversationHistory, resolveConversationId } from "../db.server";
 import { detectLanguage } from "../services/gemini.server";
-import { resolveInstalledShopOrigin } from "../services/shop-origin.server";
+import { resolveInstalledShopOrigin, shopDomainFor } from "../services/shop-origin.server";
 import { getCustomerAccountUrls } from "../services/customer-account.server";
 import AppConfig from "../services/config.server";
 import { createSseStream } from "../services/streaming.server";
@@ -58,7 +58,7 @@ export async function action({ request }) {
     try {
       const body = JSON.parse(await request.text());
       await prisma.clickLog.create({ data: {
-        shop: new URL(shopOrigin).hostname,
+        shop: shopDomainFor(new URL(shopOrigin).hostname),
         title: String(body.title || "").slice(0, 200),
         url: String(body.url || "").slice(0, 500),
       } });
@@ -255,7 +255,7 @@ async function handleChatSession({
                 toolUseResponse = { content: [{ type: "text", text: JSON.stringify(result) }] };
                 // Registre des demandes (rapports) — sans donnée personnelle
                 prisma.demandLog.create({ data: {
-                  shop: new URL(shopOrigin).hostname,
+                  shop: shopDomainFor(new URL(shopOrigin).hostname),
                   couleur: String(toolArgs.couleur || "").toLowerCase().slice(0, 60),
                   type: String(toolArgs.type || "").toLowerCase().slice(0, 80),
                   taille: String(toolArgs.taille || "").slice(0, 20),

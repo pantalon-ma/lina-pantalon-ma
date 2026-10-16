@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 vi.mock("../app/db.server", () => ({ default: { session: { findFirst: async () => null } } }));
+vi.mock("../app/services/shop-origin.server", () => ({ shopDomainFor: (h) => h }));
 import { searchCatalog } from "../app/services/catalog.server";
 const v=(id,c,t,a,img)=>({id:`gid://shopify/ProductVariant/${id}`,availableForSale:a,price:{amount:"229.0"},selectedOptions:[{name:"Couleur",value:c},{name:"Taille",value:t}],image:{url:img||"i"+id}});
 const prods=[
