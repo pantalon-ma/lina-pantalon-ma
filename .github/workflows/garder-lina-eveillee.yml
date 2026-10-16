@@ -1,0 +1,14 @@
+# Garde Lina éveillée sur Render (offre gratuite = mise en veille après 15 min sans visite).
+# Appel toutes les 14 minutes de 8h à minuit (heure du Maroc), pour rester sous les minutes gratuites de GitHub.
+name: Garder Lina éveillée
+on:
+  schedule:
+    - cron: "*/14 7-23 * * *"
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Réveiller Lina
+        run: curl -s -o /dev/null -w "%{http_code}\n" --max-time 90 https://lina-pantalon-ma.onrender.com/healthz || true
