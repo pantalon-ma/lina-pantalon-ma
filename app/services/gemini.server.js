@@ -29,6 +29,7 @@ export function detectLanguage(messages) {
 
 export function createGeminiService(apiKey = process.env.GEMINI_API_KEY) {
   const ai = new GoogleGenAI({ apiKey });
+  let noThinkingOk = true;
 
   const getSystemPrompt = (promptType) => {
     const raw = systemPrompts.systemPrompts[promptType]?.content ||
@@ -115,27 +116,26 @@ export function createGeminiService(apiKey = process.env.GEMINI_API_KEY) {
     // Modèles essayés dans l'ordre : si l'offre gratuite est saturée (503/429), on passe au suivant
     const models = [...new Set([AppConfig.api.defaultModel, ...FALLBACK_MODELS])];
     let stream, lastErr;
+    const contents = toGeminiContents(messages);
+    const systemInstruction = getSystemPrompt(promptType) + langHint(messages);
+    const geminiTools = toGeminiTools(tools);
     for (const model of models) {
-      for (let attempt = 0; attempt < 3 && !stream; attempt++) {
+      for (let attempt = 0; attempt < 2 && !stream; attempt++) {
         try {
-          stream = await ai.models.generateContentStream({
-            model,
-            contents: toGeminiContents(messages),
-            config: {
-              systemInstruction: getSystemPrompt(promptType) + langHint(messages),
-              maxOutputTokens: AppConfig.api.maxTokens,
-              tools: toGeminiTools(tools),
-            },
-          });
+          const config = { systemInstruction, maxOutputTokens: AppConfig.api.maxTokens, tools: geminiTools };
+          // Réflexion minimale = réponse plus rapide (désactivée si le modèle ne l'accepte pas)
+          if (noThinkingOk) config.thinkingConfig = { thinkingBudget: 0 };
+          stream = await ai.models.generateContentStream({ model, contents, config });
         } catch (e) {
           lastErr = e;
           const msg = String(e?.message || e);
+          if (noThinkingOk && /thinking/i.test(msg)) { noThinkingOk = false; attempt--; continue; }
           const busy = /503|UNAVAILABLE|overloaded|high demand|429|RESOURCE_EXHAUSTED/i.test(msg);
           console.warn(`[Lina] Gemini ${model} indisponible (essai ${attempt + 1})`);
           const gone = /404|NOT_FOUND|no longer available|not found/i.test(msg);
           if (gone) break; // modèle retiré : on passe directement au suivant
           if (!busy) throw normalizeError(e);
-          await new Promise((r) => setTimeout(r, 1500 * (attempt + 1)));
+          await new Promise((r) => setTimeout(r, 800 * (attempt + 1)));
         }
       }
       if (stream) break;

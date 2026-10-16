@@ -6,7 +6,6 @@ import MCPClient from "../mcp-client";
 import prisma, { saveMessage, getConversationHistory, resolveConversationId } from "../db.server";
 import { detectLanguage } from "../services/gemini.server";
 import { resolveInstalledShopOrigin, shopDomainFor } from "../services/shop-origin.server";
-import { getCustomerAccountUrls } from "../services/customer-account.server";
 import AppConfig from "../services/config.server";
 import { createSseStream } from "../services/streaming.server";
 import { createClaudeService } from "../services/claude.server";
@@ -14,6 +13,11 @@ import { createGeminiService } from "../services/gemini.server";
 import { createToolService } from "../services/tool.server";
 import { catalogTool, searchCatalog, CATALOG_TOOL_NAME } from "../services/catalog.server";
 
+
+const MCP_TOOLS_TTL = 30 * 60 * 1000;
+const mcpToolsCache = new Map(); // shopOrigin -> { at, tools }
+const MAX_HISTORY = 14;
+const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]);
 
 /**
  * Rract Router loader function for handling GET requests
@@ -153,27 +157,28 @@ async function handleChatSession({
     : createGeminiService();
   const toolService = createToolService();
 
-  // Initialize MCP client
-  const { mcpApiUrl } = (await getCustomerAccountUrls(shopOrigin, conversationId)) ?? {};
-
-  const mcpClient = new MCPClient(shopOrigin, conversationId, mcpApiUrl);
+  // Client MCP Shopify (outils panier/politiques) — liste des outils mise en cache pour aller vite
+  const mcpClient = new MCPClient(shopOrigin, conversationId);
 
   try {
     // Send conversation ID to client
     stream.sendMessage({ type: 'id', conversation_id: conversationId });
 
-    // Connect to MCP servers and get available tools
-    let storefrontMcpTools = [], customerMcpTools = [];
-
-    try {
-      storefrontMcpTools = await mcpClient.connectToStorefrontServer();
-      customerMcpTools = await mcpClient.connectToCustomerServer();
-
-      console.log(`Connected to MCP with ${storefrontMcpTools.length} tools`);
-      console.log(`Connected to customer MCP with ${customerMcpTools.length} tools`);
-    } catch (error) {
-      console.warn('Failed to connect to MCP servers, continuing without tools:', error.message);
+    const cached = mcpToolsCache.get(shopOrigin);
+    if (cached && Date.now() - cached.at < MCP_TOOLS_TTL) {
+      mcpClient.storefrontTools = cached.tools;
+      mcpClient.tools = [...cached.tools];
+    } else {
+      try {
+        const tools = await withTimeout(mcpClient.connectToStorefrontServer(), 4000);
+        mcpToolsCache.set(shopOrigin, { at: Date.now(), tools });
+      } catch (error) {
+        console.warn('MCP indisponible, on continue sans:', error.message);
+        mcpToolsCache.set(shopOrigin, { at: Date.now() - MCP_TOOLS_TTL + 60000, tools: [] });
+      }
     }
+    // Le catalogue est préchargé en parallèle pendant que Gemini réfléchit
+    searchCatalog(shopOrigin, {}).catch(() => {});
 
     // Prepare conversation state
     let conversationHistory = [];
@@ -185,8 +190,15 @@ async function handleChatSession({
     // Fetch all messages from the database for this conversation
     const dbMessages = await getConversationHistory(conversationId);
 
-    // Format messages for Claude API
-    conversationHistory = dbMessages.map(dbMessage => {
+    // Format messages for Claude API (on garde seulement les derniers échanges : plus rapide)
+    let recent = dbMessages;
+    if (recent.length > MAX_HISTORY) {
+      recent = recent.slice(-MAX_HISTORY);
+      // l'historique doit commencer par un vrai message texte de la cliente
+      const start = recent.findIndex((m) => m.role === 'user' && !String(m.content).trim().startsWith('['));
+      recent = start >= 0 ? recent.slice(start) : dbMessages.slice(-1);
+    }
+    conversationHistory = recent.map(dbMessage => {
       let content;
       try {
         content = JSON.parse(dbMessage.content);

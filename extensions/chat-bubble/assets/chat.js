@@ -61,8 +61,10 @@
         closeButton.addEventListener('click', () => this.closeChatWindow());
 
         // Send message when pressing Enter in input
-        chatInput.addEventListener('keypress', (e) => {
-          if (e.key === 'Enter' && chatInput.value.trim() !== '') {
+        chatInput.addEventListener('keydown', (e) => {
+          if (e.isComposing || e.keyCode === 229) return;
+          if ((e.key === 'Enter' || e.keyCode === 13) && chatInput.value.trim() !== '') {
+            e.preventDefault();
             ShopAIChat.Message.send(chatInput, messagesContainer);
 
             // On mobile, handle keyboard

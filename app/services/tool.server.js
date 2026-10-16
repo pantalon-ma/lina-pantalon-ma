@@ -52,7 +52,23 @@ export function createToolService() {
       productsToDisplay.push(...processProductSearchResult(toolUseResponse));
     }
 
-    addToolResultToHistory(conversationHistory, toolUseId, toolUseResponse.content, conversationId);
+    // Version courte pour l'historique (sans photos ni listes) : réponses de l'IA plus rapides
+    let historyContent = toolUseResponse.content;
+    if (toolName === "rechercher_modeles") {
+      try {
+        const d = JSON.parse(toolUseResponse.content[0].text);
+        const compact = {
+          note: d.note, similaires: d.similaires, saison: d.saison,
+          modeles_affiches: (d.products || []).map((p) => ({
+            nom: p.title, prix: p.price, couleur: p.couleur_proposee,
+            ...(p.taille_proposee ? { taille: p.taille_proposee } : {}),
+            ...(p.sizes && p.sizes.length ? { tailles: p.sizes.join(",") } : {}),
+          })),
+        };
+        historyContent = [{ type: "text", text: JSON.stringify(compact) }];
+      } catch (e) { /* garde l'original */ }
+    }
+    addToolResultToHistory(conversationHistory, toolUseId, historyContent, conversationId);
   };
 
   /**

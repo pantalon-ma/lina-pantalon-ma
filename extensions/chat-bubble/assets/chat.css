@@ -647,3 +647,15 @@
 
 .shop-ai-chat-bubble.lina-launcher svg.lina-agent{width:56px !important;height:56px !important;margin-top:8px}
 @media (max-width:480px){.shop-ai-chat-bubble.lina-launcher svg.lina-agent{width:50px !important;height:50px !important}}
+
+/* --- Téléphone : launcher au-dessus de la barre verte « Commander », et caché quand le chat est ouvert --- */
+@media (max-width:480px){
+  .shop-ai-chat-container{bottom:88px !important;right:12px !important}
+  .lina-hint{bottom:156px !important}
+  body.shop-ai-chat-open .shop-ai-chat-bubble{display:none !important}
+  body.shop-ai-chat-open .shop-ai-chat-container{z-index:2147483647 !important}
+  body.shop-ai-chat-open [class*="whatsapp" i]:not(.shop-ai-chat-container *),body.shop-ai-chat-open [id*="whatsapp" i]:not(.shop-ai-chat-container *){display:none !important}
+  .shop-ai-chat-window.active{bottom:0 !important}
+  .shop-ai-chat-input{padding-bottom:calc(10px + env(safe-area-inset-bottom)) !important}
+  .shop-ai-chat-input input{font-size:16px !important}
+}
