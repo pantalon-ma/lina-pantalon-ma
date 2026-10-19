@@ -249,6 +249,19 @@
         return '';
       },
 
+      // Petit emoji à côté des types : classique / casual / sport
+      typeIcon: function(label) {
+        const l = label.toLowerCase();
+        const e = function(x) { return '<span class="lina-type-ico" aria-hidden="true">' + x + '</span>'; };
+        if (/^classique$|كلاسيك/.test(l)) return e('💼');
+        if (/^casual$|كاجوال/.test(l)) return e('👖');
+        if (/^sport$|سبور/.test(l)) return e('👟');
+        if (/^hiver$|الشتا/.test(l)) return e('❄️');
+        if (/^demi-saison$|نص الموسم/.test(l)) return e('🍂');
+        if (/^[ée]t[ée]$|الصيف/.test(l)) return e('☀️');
+        return '';
+      },
+
       // Boutons de couleur affichés dans leur couleur
       COLORS: [
         [/bleu marine|marine|مارين|كحلي/i, '#1F2A44'], [/bleu jean|jean/i, '#4A6F9C'], [/bleu ciel|ciel/i, '#9CC6E8'], [/bleu roi/i, '#2347A6'], [/turquoise/i, '#2BB3B1'], [/canard|p[ée]trole/i, '#1F5F6B'], [/bleu|زرق/i, '#3B6BB5'],
@@ -284,7 +297,7 @@
           b.className = 'lina-quick-btn';
           b.textContent = label;
           if (/[\u0600-\u06FF]/.test(label)) b.dir = 'rtl';
-          const icon = ShopAIChat.Quick.cutIcon(label);
+          const icon = ShopAIChat.Quick.cutIcon(label) || ShopAIChat.Quick.typeIcon(label);
           if (icon) {
             b.classList.add('lina-quick-cut');
             b.innerHTML = icon + '<span>' + label + '</span>';
