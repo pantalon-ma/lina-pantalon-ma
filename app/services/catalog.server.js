@@ -191,35 +191,36 @@ export async function searchCatalog(shopOrigin, args = {}) {
       .sort((a, b) => b.s - a.s || b.z - a.z)
       .map((x) => x.p);
 
+  const saison = currentSeason() === "hiver" ? "automne/hiver (modèles chauds proposés en premier)" : "printemps/été (modèles légers proposés en premier)";
+
+  // 0) sans taille : on ne propose rien, Lina demande d'abord la taille
+  if (!String(taille).trim()) {
+    return { demande: { couleur, type, taille }, besoin_taille: true, similaires: false, rupture: false,
+      note: "Taille inconnue : demande d'abord la taille de la cliente avant de proposer des modèles.", products: [] };
+  }
+
   // 1) correspondance exacte : type + couleur + taille, en stock
   let found = rank(all.filter((p) => fits(p, true, true)));
-  let similaires = false;
-  let note = "";
 
-  // 2) sinon, modèles similaires disponibles
+  // 2) rupture : on ne montre rien, on donne les choix possibles (autre couleur du même modèle / autre modèle même couleur)
   if (!found.length) {
-    similaires = true;
-    const steps = [
-      [() => bySeason(all.filter((p) => fits(p, true, true))), "même couleur et même taille, autre coupe"],
-      [() => rank(all.filter((p) => fits(p, false, true))), "même coupe et même taille, autre couleur"],
-      // (jamais d'autre taille : on ne propose que des modèles disponibles dans SA taille)
-      ...(taille ? [] : [[() => rank(all.filter((p) => fits(p, true, false))), "même coupe et même couleur"]]),
-      [() => bySeason(all.filter((p) => fits(p, false, true))), "même taille, autres modèles"],
-    ];
-    for (const [get, why] of steps) {
-      found = get();
-      if (found.length) { note = why; break; }
-    }
+    const memeModele = type ? rank(all.filter((p) => fits(p, false, true))).filter((p) => keywordScore(p, type) >= 0.5) : [];
+    const autresCouleurs = [...new Set(memeModele.flatMap((p) => p.variants.nodes
+      .filter((v) => v.availableForSale && sizeMatches(sizeOf(v), taille)).map((v) => colorOf(v).replace(/\s?\d+$/, ""))))].filter(Boolean).slice(0, 8);
+    const autresModeles = couleur ? all.filter((p) => fits(p, true, true)).length : 0;
+    return { demande: { couleur, type, taille }, rupture: true, similaires: false, saison,
+      note: "Rupture : aucun modèle disponible pour cette demande dans sa taille. Dis-le et propose : autre couleur du même modèle, ou autre modèle dans la même couleur.",
+      autres_couleurs_meme_modele: autresCouleurs, autres_modeles_meme_couleur: autresModeles, products: [] };
   }
+  const similaires = false;
 
   const products = found.slice(0, max).map((p) => shape(p, shopOrigin, couleur, taille));
   return {
     demande: { couleur, type, taille },
-    saison: currentSeason() === "hiver" ? "automne/hiver (modèles chauds proposés en premier)" : "printemps/été (modèles légers proposés en premier)",
+    saison,
     similaires,
-    note: similaires
-      ? `Aucun modèle exact en stock. Modèles similaires disponibles : ${note || "aucun"}.`
-      : "Modèles en stock correspondant à la demande.",
+    rupture: false,
+    note: "Modèles en stock dans sa taille correspondant à la demande.",
     products,
   };
 }

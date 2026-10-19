@@ -266,12 +266,12 @@ async function handleChatSession({
                 const result = await searchCatalog(shopOrigin, toolArgs);
                 toolUseResponse = { content: [{ type: "text", text: JSON.stringify(result) }] };
                 // Registre des demandes (rapports) — sans donnée personnelle
-                prisma.demandLog.create({ data: {
+                if (!result.besoin_taille) prisma.demandLog.create({ data: {
                   shop: shopDomainFor(new URL(shopOrigin).hostname),
                   couleur: String(toolArgs.couleur || "").toLowerCase().slice(0, 60),
                   type: String(toolArgs.type || "").toLowerCase().slice(0, 80),
                   taille: String(toolArgs.taille || "").slice(0, 20),
-                  exact: !result.similaires,
+                  exact: !result.rupture,
                   nbProposes: result.products.length,
                   modeles: result.products.map((p) => p.title).join(" | ").slice(0, 1000),
                   langue: detectLanguage(conversationHistory) || "",
