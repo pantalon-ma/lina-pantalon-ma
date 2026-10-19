@@ -58,6 +58,10 @@ const Q = {
 export function fastReply(messages, langue) {
   const users = messages.filter((m) => m.role === "user").map(textOf).filter((t) => t.trim());
   const last = (users[users.length - 1] || "").trim();
+  if (/conseill[eè]re|parler à (une|quelqu)|un humain|une personne|whatsapp|واتساب|مستشارة|شي حد/i.test(last) && last.length <= 60)
+    return langue === "darija"
+      ? "الفريق ديالنا كيجاوبك على واتساب 😊\n[كتبي لينا على واتساب](https://wa.me/212703200695)"
+      : "Notre équipe vous répond sur WhatsApp 😊\n[Écrire sur WhatsApp](https://wa.me/212703200695)";
   if (/^(je ne connais pas ma taille|ما عارفاش المقاس)$/i.test(last)) return (langue === "darija" ? Q.ar : Q.fr).mesures;
   if (!last || last.length > 22) return null;
   const st = flowState(messages);

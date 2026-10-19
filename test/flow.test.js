@@ -24,3 +24,6 @@ describe("instantané : mesures et taille lettre", () => {
   it("je ne connais pas ma taille -> mesures", async () => { const { fastReply } = await import("../app/services/flow.server.js"); expect(fastReply([U("Classique"),A("x"),U("Large"),A("x"),U("Noir"),A("saison ?"),U("Hiver"),A("Votre taille ?"),U("Je ne connais pas ma taille")])).toMatch(/hanches/); });
   it("« l'hiver » n'est pas une taille L", async () => { const { fastReply } = await import("../app/services/flow.server.js"); expect(fastReply([U("noir pour l'hiver"),A("x"),U("Classique"),A("x"),U("Large")])).toMatch(/taille/); });
 });
+describe("conseillère", () => {
+  it("bouton -> lien WhatsApp immédiat", async () => { const { fastReply } = await import("../app/services/flow.server.js"); expect(fastReply([U("Parler à une conseillère")])).toMatch(/wa\.me\/212703200695/); });
+});

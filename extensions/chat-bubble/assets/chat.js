@@ -416,6 +416,15 @@
             // Just return normal link that will be handled by the document click handler
             return '<a href="#auth" class="shop-auth-trigger">' + text + '</a>';
           }
+          // Lien WhatsApp : gros bouton vert avec icône et numéro
+          else if (url.includes('wa.me') || url.includes('whatsapp')) {
+            const num = (url.match(/wa\.me\/(\d+)/) || [])[1] || '212703200695';
+            const local = '0' + num.replace(/^212/, '');
+            const pretty = local.replace(/(\d{2})(?=\d)/g, '$1 ').trim();
+            return '<a href="https://wa.me/' + num + '" target="_blank" rel="noopener noreferrer" class="lina-wa-btn">' +
+              '<svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><path fill="#fff" d="M16 3C9 3 3.3 8.6 3.3 15.6c0 2.4.7 4.7 1.9 6.7L3 29l6.9-2.2c1.9 1 4 1.6 6.1 1.6 7 0 12.7-5.7 12.7-12.7S23 3 16 3zm0 23.1c-1.9 0-3.8-.5-5.4-1.5l-.4-.2-4.1 1.3 1.3-4-.3-.4c-1.1-1.7-1.7-3.7-1.7-5.7C5.4 9.8 10.2 5 16 5s10.6 4.8 10.6 10.6S21.8 26.1 16 26.1zm5.8-7.9c-.3-.2-1.9-.9-2.2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.3-.5-2.5-1.6-.9-.8-1.6-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.5-.6c.2-.2.2-.3.3-.6.1-.2 0-.4 0-.6l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.2-1.2 2.9s1.2 3.4 1.4 3.6c.2.2 2.4 3.7 5.9 5.2.8.4 1.5.6 2 .7.8.3 1.6.2 2.2.1.7-.1 1.9-.8 2.2-1.6.3-.8.3-1.4.2-1.6-.1-.1-.3-.2-.6-.4z"/></svg>' +
+              '<span>' + text + '<br><small>' + pretty + '</small></span></a>';
+          }
           // If it's a checkout link, replace the text
           else if (url.includes('/cart') || url.includes('checkout')) {
             return '<a href="' + url + '" target="_blank" rel="noopener noreferrer">click here to proceed to checkout</a>';
