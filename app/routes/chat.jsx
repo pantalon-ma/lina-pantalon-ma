@@ -268,7 +268,7 @@ async function handleChatSession({
                 const result = await searchCatalog(shopOrigin, toolArgs);
                 toolUseResponse = { content: [{ type: "text", text: JSON.stringify(result) }] };
                 // Registre des demandes (rapports) — sans donnée personnelle
-                if (!result.besoin_taille) prisma.demandLog.create({ data: {
+                if (!result.besoin_taille && !result.mesure_manquante) prisma.demandLog.create({ data: {
                   shop: shopDomainFor(new URL(shopOrigin).hostname),
                   couleur: String(toolArgs.couleur || "").toLowerCase().slice(0, 60),
                   type: String(toolArgs.type || "").toLowerCase().slice(0, 80),

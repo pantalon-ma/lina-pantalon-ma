@@ -61,6 +61,7 @@ export function createToolService() {
           note: d.note, similaires: d.similaires, saison: d.saison,
           ...(d.rupture ? { rupture: true, autres_couleurs_meme_modele: d.autres_couleurs_meme_modele, autres_modeles_meme_couleur: d.autres_modeles_meme_couleur } : {}),
           ...(d.besoin_taille ? { besoin_taille: true } : {}),
+          ...(d.mesure_manquante ? { mesure_manquante: d.mesure_manquante } : {}),
           modeles_affiches: (d.products || []).map((p) => ({
             nom: p.title, prix: p.price, couleur: p.couleur_proposee,
             ...(p.taille_proposee ? { taille: p.taille_proposee } : {}),

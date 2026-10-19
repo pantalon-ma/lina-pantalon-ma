@@ -41,3 +41,6 @@ describe("taille selon mesures",()=>{
 describe("styles",()=>{
  it("sport/classique/casual",async()=>{const {styleOf:f}=await import("../app/services/catalog.server.js");const P=(t)=>({title:t,tags:[]});expect(f(P("Pantalon Femme - Droit Poches Zippées CE - Molleton"))).toBe("sport");expect(f(P("Pantalon Femme - Large à 2 Boutons - Milano Etirable"))).toBe("sport");expect(f(P("Pantalon Femme - Classique à Fentes - Flanelle"))).toBe("classique");expect(f(P("Pantalon Femme - Palazzo à Plis - Crêpe Corée"))).toBe("casual");});
 });
+describe("mesures incomplètes",()=>{
+ it("hanches seules -> demander le tour de taille",async()=>{const r=await searchCatalog("https://m.ma",{couleur:"noir",type:"large",tour_hanches:123});expect(r.mesure_manquante).toBe("tour_taille");expect(r.products.length).toBe(0);});
+});

@@ -304,6 +304,13 @@ export async function searchCatalog(shopOrigin, args = {}) {
 
   const saison = saisonVoulue === "hiver" ? "automne/hiver (modèles chauds proposés en premier)" : "printemps/été (modèles légers proposés en premier)";
 
+  // 0bis) mesures incomplètes : il faut les DEUX (hanches + taille) pour décider la taille finale
+  if (!taille && parMesures && !(mesures.tour_hanches && mesures.tour_taille)) {
+    const manque = mesures.tour_hanches ? "tour_taille" : "tour_hanches";
+    return { demande: { couleur, type, taille }, mesure_manquante: manque, rupture: false, similaires: false,
+      note: `Il manque le ${manque === "tour_taille" ? "tour de taille" : "tour de hanches"} de la cliente : demande-le (en cm) avant de proposer des modèles.`, products: [] };
+  }
+
   // 0) sans taille : on ne propose rien, Lina demande d'abord la taille
   if (!taille && !parMesures) {
     return { demande: { couleur, type, taille }, besoin_taille: true, similaires: false, rupture: false,
