@@ -202,7 +202,21 @@ export async function createOrUpdateConversation(conversationId) {
  * @param {string} content - The message content
  * @returns {Promise<Object>} - The saved message
  */
-export async function saveMessage(conversationId, role, content) {
+// Les messages d'une conversation sont enregistrés l'un après l'autre (ordre garanti)
+const saveQueues = new Map();
+export function saveMessage(conversationId, role, content) {
+  const prev = saveQueues.get(conversationId) || Promise.resolve();
+  const next = prev.catch(() => {}).then(() => saveMessageNow(conversationId, role, content));
+  saveQueues.set(conversationId, next);
+  next.finally(() => { if (saveQueues.get(conversationId) === next) saveQueues.delete(conversationId); }).catch(() => {});
+  return next;
+}
+/** Attend que tous les messages en cours d'enregistrement soient écrits */
+export async function flushMessages(conversationId) {
+  const q = saveQueues.get(conversationId);
+  if (q) await q.catch(() => {});
+}
+async function saveMessageNow(conversationId, role, content) {
   try {
     // Ensure the conversation exists
     await createOrUpdateConversation(conversationId);

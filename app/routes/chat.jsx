@@ -3,7 +3,7 @@
  * Handles chat interactions with Claude API and tools
  */
 import MCPClient from "../mcp-client";
-import prisma, { saveMessage, getConversationHistory, resolveConversationId } from "../db.server";
+import prisma, { saveMessage, flushMessages, getConversationHistory, resolveConversationId } from "../db.server";
 import { detectLanguage } from "../services/gemini.server";
 import { resolveInstalledShopOrigin, shopDomainFor } from "../services/shop-origin.server";
 import AppConfig from "../services/config.server";
@@ -327,6 +327,9 @@ async function handleChatSession({
         }
       );
     }
+
+    // Tout est enregistré avant de rendre la main (le message suivant voit l'historique complet)
+    await flushMessages(conversationId);
 
     // Signal end of turn
     stream.sendMessage({ type: 'end_turn' });
