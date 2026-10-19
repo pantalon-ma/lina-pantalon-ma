@@ -246,7 +246,7 @@ function seasonScore(product, season = currentSeason()) {
 
 // Grandes familles de coupes : Large (palazzo, pantalon jupe), Droit, À fentes (cigarette)…
 const TYPE_SYNONYMS = {
-  large: ["large", "palazzo", "pantalon jupe", "wide", "evase"],
+  large: ["large", "palazzo", "pantalon jupe", "wide"],
   wide: ["large", "palazzo", "pantalon jupe"],
   "واسع": ["large", "palazzo", "pantalon jupe"],
   palazzo: ["palazzo"],
@@ -302,6 +302,9 @@ export async function searchCatalog(shopOrigin, args = {}) {
   const sa = String(args.saison || "");
   const saisonVoulue = veutChaud ? "hiver" : veutLeger ? "ete" : /demi|mi.saison|intersaison|نص/i.test(sa) ? "demi" : /ete|été|printemps|صيف/i.test(sa) ? "ete" : /hiver|automne|شتا/i.test(sa) ? "hiver" : currentSeason();
   let all = (await loadCatalog(shopOrigin)).filter((p) => p.availableForSale);
+  // Les jupes ne sont proposées que si la cliente demande une jupe (pas « pantalon jupe »)
+  const veutJupe = /\bjupe\b/i.test(type) && !/pantalon\s+jupe/i.test(type);
+  if (!veutJupe) all = all.filter((p) => !/^jupe\b/.test(cleanTitle(p.title)));
   if (style) {
     const sameStyle = all.filter((p) => styleOf(p) === style);
     if (sameStyle.length) all = sameStyle;

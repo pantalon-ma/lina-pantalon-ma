@@ -53,3 +53,4 @@ describe("pantalon chaud", () => {
     expect(r.saison).toMatch(/hiver/);
   });
 });
+describe("jupes", () => { it("« large » ne matche pas « Jupe Evasée »", async () => { const { keywordScore: k } = await import("../app/services/catalog.server.js"); expect(k({ title: "Pantalon Femme - Jupe Evasée à Ceinture", productType: "", tags: [] }, "large")).toBe(0); }); });
