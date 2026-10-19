@@ -231,6 +231,37 @@
     /**
      * Message handling and display functionality
      */
+    /**
+     * Boutons de réponse rapide (type, coupe, couleur, taille…)
+     */
+    Quick: {
+      WELCOME: ['Classique', 'Casual', 'Sport', 'كلاسيك', 'كاجوال', 'سبور'],
+      clear: function() {
+        document.querySelectorAll('.lina-quick').forEach(function(el) { el.remove(); });
+      },
+      show: function(options, messagesContainer) {
+        this.clear();
+        if (!options || !options.length) return;
+        const box = document.createElement('div');
+        box.className = 'lina-quick';
+        options.forEach(function(label) {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'lina-quick-btn';
+          b.textContent = label;
+          if (/[\u0600-\u06FF]/.test(label)) b.dir = 'rtl';
+          b.addEventListener('click', function() {
+            const input = ShopAIChat.UI.elements.chatInput;
+            input.value = label;
+            ShopAIChat.Message.send(input, messagesContainer);
+          });
+          box.appendChild(b);
+        });
+        messagesContainer.appendChild(box);
+        ShopAIChat.UI.scrollToBottom();
+      }
+    },
+
     Message: {
       /**
        * Send a message to the API
@@ -240,6 +271,7 @@
       send: async function(chatInput, messagesContainer) {
         const userMessage = chatInput.value.trim();
         const conversationId = sessionStorage.getItem('shopAiConversationId');
+        ShopAIChat.Quick.clear();
 
         // Add user message to chat
         this.add(userMessage, 'user', messagesContainer);
@@ -594,6 +626,10 @@
             ShopAIChat.UI.displayProductResults(data.products);
             break;
 
+          case 'quick_replies':
+            ShopAIChat.Quick.show(data.options, messagesContainer);
+            break;
+
           case 'tool_use':
             // Les appels d'outils techniques ne sont pas montrés aux clientes
             if (false && data.tool_use_message) {
@@ -662,6 +698,7 @@
           if (!data.messages || data.messages.length === 0) {
             const welcomeMessage = "Bonjour 👋 Je suis Lina, votre conseillère pantalon.ma.\nالسلام 👋 أنا لينا، غادي نعاونك تلقاي السروال اللي يعجبك!\n\nQuel type de pantalon : classique, casual ou sport ?\nأشمن نوع: كلاسيك، كاجوال ولا سبور؟";
             ShopAIChat.Message.add(welcomeMessage, 'assistant', messagesContainer);
+            ShopAIChat.Quick.show(ShopAIChat.Quick.WELCOME, messagesContainer);
             return;
           }
 
@@ -694,6 +731,7 @@
           // Show error and welcome message
           const welcomeMessage = "Bonjour 👋 Je suis Lina, votre conseillère pantalon.ma.\nالسلام 👋 أنا لينا، غادي نعاونك تلقاي السروال اللي يعجبك!\n\nQuel type de pantalon : classique, casual ou sport ?\nأشمن نوع: كلاسيك، كاجوال ولا سبور؟";
           ShopAIChat.Message.add(welcomeMessage, 'assistant', messagesContainer);
+            ShopAIChat.Quick.show(ShopAIChat.Quick.WELCOME, messagesContainer);
 
           // Clear the conversation ID since we couldn't fetch this conversation
           sessionStorage.removeItem('shopAiConversationId');
@@ -901,6 +939,7 @@
         // No previous conversation, show welcome message
         const welcomeMessage = "Bonjour 👋 Je suis Lina, votre conseillère pantalon.ma.\nالسلام 👋 أنا لينا، غادي نعاونك تلقاي السروال اللي يعجبك!\n\nQuel type de pantalon : classique, casual ou sport ?\nأشمن نوع: كلاسيك، كاجوال ولا سبور؟";
         this.Message.add(welcomeMessage, 'assistant', this.UI.elements.messagesContainer);
+        this.Quick.show(this.Quick.WELCOME, this.UI.elements.messagesContainer);
       }
     }
   };

@@ -666,3 +666,8 @@
 /* --- Bouton d'envoi : rond, flèche blanche visible (le thème ne doit pas l'écraser) --- */
 .shop-ai-chat-input .shop-ai-chat-send{flex:0 0 40px !important;width:40px !important;height:40px !important;min-width:0 !important;min-height:0 !important;padding:0 !important;margin:0 0 0 8px !important;border-radius:50% !important;background:#6B2838 !important;display:flex !important;align-items:center !important;justify-content:center !important;box-shadow:none !important}
 .shop-ai-chat-input .shop-ai-chat-send svg{display:block !important;width:18px !important;height:18px !important;stroke:#fff !important;fill:none !important;visibility:visible !important;opacity:1 !important}
+
+/* --- Boutons de réponse rapide --- */
+.lina-quick{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 12px;padding:0 4px}
+.lina-quick-btn{background:#fff !important;color:#6B2838 !important;border:1.5px solid #6B2838 !important;border-radius:18px !important;padding:7px 14px !important;font-size:14px !important;font-weight:600;line-height:1.2;cursor:pointer;min-height:0 !important;width:auto !important;box-shadow:none !important}
+.lina-quick-btn:active,.lina-quick-btn:hover{background:#6B2838 !important;color:#fff !important}

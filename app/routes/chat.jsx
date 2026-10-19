@@ -12,6 +12,7 @@ import { createClaudeService } from "../services/claude.server";
 import { createGeminiService } from "../services/gemini.server";
 import { createToolService } from "../services/tool.server";
 import { catalogTool, searchCatalog, CATALOG_TOOL_NAME } from "../services/catalog.server";
+import { quickRepliesFor } from "../services/quick-replies.server";
 
 
 const MCP_TOOLS_TTL = 30 * 60 * 1000;
@@ -183,6 +184,7 @@ async function handleChatSession({
     // Prepare conversation state
     let conversationHistory = [];
     let productsToDisplay = [];
+    let produitsAffiches = false;
 
     // Save user message to the database
     await saveMessage(conversationId, 'user', userMessage);
@@ -309,6 +311,7 @@ async function handleChatSession({
 
             // Cartes produits affichées tout de suite (photos, prix, lien), avant le texte de Lina
             if (toolName === CATALOG_TOOL_NAME && productsToDisplay.length > 0) {
+              produitsAffiches = true;
               stream.sendMessage({ type: 'product_results', products: [...productsToDisplay] });
               productsToDisplay.length = 0;
             }
@@ -332,6 +335,14 @@ async function handleChatSession({
 
     // Tout est enregistré avant de rendre la main (le message suivant voit l'historique complet)
     await flushMessages(conversationId);
+
+    // Boutons de réponse rapide (type, coupe, couleur, taille…) selon la question de Lina
+    try {
+      const last = finalMessage?.content;
+      const lastText = Array.isArray(last) ? last.filter((b) => b.type === 'text').map((b) => b.text).join(' ') : String(last || '');
+      const options = quickRepliesFor(lastText, { langue: detectLanguage(conversationHistory), produitsAffiches });
+      if (options.length) stream.sendMessage({ type: 'quick_replies', options });
+    } catch (e) { console.warn('[Lina] boutons:', e.message); }
 
     // Signal end of turn
     stream.sendMessage({ type: 'end_turn' });
