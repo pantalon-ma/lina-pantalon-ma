@@ -21,6 +21,8 @@ const AR = {
   apres: ["ألوان أخرى", "قصة أخرى", "نهضر مع مستشارة"],
 };
 
+export const BUTTONS = { FR, AR };
+
 export function quickRepliesFor(text, { langue, produitsAffiches, dernierMessage } = {}) {
   const L = langue === "darija" ? AR : FR;
   const t = String(text || "").toLowerCase();

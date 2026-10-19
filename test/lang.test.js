@@ -11,3 +11,9 @@ describe("langue",()=>{
  it("suit le dernier",()=>expect(detectLanguage([{role:"user",content:"bghit sarwal"},{role:"assistant",content:"x"},{role:"user",content:"Je préfère le beige"}])).toBe("français"));
  it("ignore tool_result",()=>expect(detectLanguage([{role:"user",content:"Je veux un jean"},{role:"assistant",content:[]},{role:"user",content:[{type:"tool_result",content:"x"}]}])).toBe("français"));
 });
+describe("langue collante", () => {
+  it("darija écrite puis clics sur boutons français", async () => {
+    const { detectLanguage } = await import("../app/services/gemini.server.js");
+    expect(detectLanguage([{role:"user",content:"بغيت سروال كحل"},{role:"assistant",content:"x"},{role:"user",content:"Parler à une conseillère"}])).toBe("darija");
+  });
+});

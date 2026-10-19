@@ -7,6 +7,10 @@ import { GoogleGenAI } from "@google/genai";
 import AppConfig from "./config.server";
 import systemPrompts from "../prompts/prompts.json";
 import { flowHint } from "./flow.server";
+import { BUTTONS } from "./quick-replies.server";
+
+// Les clics sur les boutons français ne changent pas la langue de la cliente
+const FR_BUTTONS = new Set(Object.values(BUTTONS.FR).flat().map((l) => l.toLowerCase()));
 
 const noThinkingModels = new Set(); // modèles qui refusent thinkingBudget: 0
 const FALLBACK_MODELS = ["gemini-flash-lite-latest", "gemini-flash-latest", "gemini-flash-lite-latest"];
@@ -18,7 +22,8 @@ export function detectLanguage(messages) {
     if (m.role !== "user") continue;
     const text = typeof m.content === "string" ? m.content
       : Array.isArray(m.content) ? m.content.filter((b) => b.type === "text").map((b) => b.text).join(" ") : "";
-    if (!/[a-zA-Z\u00C0-\u017F\u0600-\u06FF]/.test(text)) continue; // résultat d'outil ou juste « 44 » : on regarde le message précédent
+    if (!/[a-zA-Z\u00C0-\u017F\u0600-\u06FF]/.test(text)) continue;
+    if (FR_BUTTONS.has(text.trim().toLowerCase())) continue; // bouton cliqué : on garde la langue des messages écrits // résultat d'outil ou juste « 44 » : on regarde le message précédent
     if (/[\u0600-\u06FF]/.test(text)) return "darija";
     const t = " " + text.toLowerCase() + " ";
     const darija = /\b(salam|bghit|bghiti|wach|chhal|shhal|kayn|kayna|wa?ss?e3|l9ed|k7el|khder|zre9|byed|3afak|3endk|3ndk|smiya|sarwal|serwal|dyal|dial|ana|nta|nti|labas|mzyan|zwin|zwina|hadi|hada|fin|ach|chno|wakha|safi|bzaf|chi|daba|ghadi|baghya|bghina)\b/.test(t) || /[a-z][379][a-z]/.test(t);
