@@ -13,6 +13,7 @@ import { createGeminiService } from "../services/gemini.server";
 import { createToolService } from "../services/tool.server";
 import { catalogTool, searchCatalog, CATALOG_TOOL_NAME } from "../services/catalog.server";
 import { quickRepliesFor } from "../services/quick-replies.server";
+import { fastReply } from "../services/flow.server";
 
 
 const MCP_TOOLS_TTL = 30 * 60 * 1000;
@@ -215,6 +216,19 @@ async function handleChatSession({
         content
       };
     });
+
+    // Clic sur un bouton du déroulé : réponse immédiate, sans attendre l'IA
+    const fast = fastReply(conversationHistory, detectLanguage(conversationHistory));
+    if (fast) {
+      stream.sendMessage({ type: 'chunk', chunk: fast });
+      const content = [{ type: 'text', text: fast }];
+      await saveMessage(conversationId, 'assistant', JSON.stringify(content));
+      stream.sendMessage({ type: 'message_complete' });
+      const options = quickRepliesFor(fast, { langue: detectLanguage(conversationHistory), dernierMessage: userMessage });
+      if (options.length) stream.sendMessage({ type: 'quick_replies', options });
+      stream.sendMessage({ type: 'end_turn' });
+      return;
+    }
 
     // Execute the conversation stream
     let finalMessage = { role: 'user', content: userMessage };

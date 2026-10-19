@@ -34,3 +34,42 @@ export function flowHint(messages, langue) {
     return `\n\n➡️ ÉTAPE IMPOSÉE : la couleur est connue, demande MAINTENANT la saison (une seule fois). N'appelle PAS l'outil. Réponds UNIQUEMENT : « ${ar ? "لأي موسم: الشتا، نص الموسم ولا الصيف؟" : "Pour quelle saison : hiver, demi-saison ou été ?"} »`;
   return "";
 }
+
+// Réponse immédiate (sans IA) quand la cliente clique un bouton du déroulé : beaucoup plus rapide
+const SIMPLE = /^(classique|casual|sport|large|droite?|[ée]troite?|hiver|[ée]t[ée]|demi[- ]saison|peu importe|كلاسيك|كاجوال|سبور|واسع|ديريكت|ضيق|الشتا|الصيف|نص الموسم|كيفما كان)$/i;
+const Q = {
+  fr: {
+    style: "Quel type de pantalon : classique, casual ou sport ?",
+    coupe: "Quelle coupe : large, droite ou étroite ?",
+    couleur: "Quelle couleur ?",
+    saison: "Pour quelle saison : hiver, demi-saison ou été ?",
+    taille: "Votre taille ?",
+  },
+  ar: {
+    style: "أشمن نوع: كلاسيك، كاجوال ولا سبور؟",
+    coupe: "شمن قصة: واسع، ديريكت ولا ضيق؟",
+    couleur: "أشمن لون؟",
+    saison: "لأي موسم: الشتا، نص الموسم ولا الصيف؟",
+    taille: "شنو المقاس ديالك؟",
+  },
+};
+export function fastReply(messages, langue) {
+  const users = messages.filter((m) => m.role === "user").map(textOf).filter((t) => t.trim());
+  const last = (users[users.length - 1] || "").trim();
+  if (!last || last.length > 22) return null;
+  const st = flowState(messages);
+  const qq = langue === "darija" ? Q.ar : Q.fr;
+  if (st.autreCouleur) return qq.couleur;
+  if (st.autreCoupe) return qq.coupe;
+  const isSimple = SIMPLE.test(last) || (familyOf(last) && last.split(/\s+/).length <= 3);
+  if (!isSimple || users.length < 1) return null;
+  const s = flowState(messages);
+  const q = langue === "darija" ? Q.ar : Q.fr;
+  if (s.autreCouleur || s.autreCoupe) return null;
+  if (!s.style) return q.style;
+  if (!s.coupe) return q.coupe;
+  if (!s.couleur) return q.couleur;
+  if (!s.saisonDite && !s.saisonDemandee) return q.saison;
+  if (!s.taille) return q.taille;
+  return null; // tout est connu : l'IA lance la recherche
+}

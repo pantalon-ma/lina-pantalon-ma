@@ -9,3 +9,14 @@ describe("déroulé", () => {
   it("autres couleurs", () => expect(flowHint([U("Noir"),A("x"),U("Autres couleurs")])).toMatch(/Quelle couleur/));
   it("darija", () => expect(flowHint([U("كحل")],"darija")).toMatch(/موسم/));
 });
+import { fastReply } from "../app/services/flow.server.js";
+describe("réponse rapide", () => {
+  it("Classique -> coupe", () => expect(fastReply([U("Classique")])).toMatch(/coupe/));
+  it("Large -> couleur", () => expect(fastReply([U("Classique"),A("Quelle coupe ?"),U("Large")])).toBe("Quelle couleur ?"));
+  it("Noir -> saison", () => expect(fastReply([U("Classique"),U("Large"),U("Noir")])).toMatch(/saison/));
+  it("Hiver -> taille", () => expect(fastReply([U("Classique"),U("Large"),U("Noir"),A("Pour quelle saison ?"),U("Hiver")])).toBe("Votre taille ?"));
+  it("44 -> IA", () => expect(fastReply([U("Classique"),U("Large"),U("Noir"),U("Hiver"),U("44")])).toBe(null));
+  it("phrase libre -> IA", () => expect(fastReply([U("je veux un pantalon pour le bureau")])).toBe(null));
+  it("darija", () => expect(fastReply([U("كلاسيك")],"darija")).toMatch(/قصة/));
+});
+describe("rapide autres", () => { it("autres couleurs", () => expect(fastReply([U("Noir"),A("x"),U("Autres couleurs")])).toBe("Quelle couleur ?")); });
