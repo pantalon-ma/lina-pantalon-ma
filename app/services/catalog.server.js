@@ -355,10 +355,19 @@ export async function searchCatalog(shopOrigin, args = {}) {
     const autresCouleurs = [...new Set(memeModele.flatMap((p) => p.variants.nodes
       .filter((v) => v.availableForSale && sizeMatches(sizeOf(v), sizeFor(p)))
       .map((v) => FAM_LABEL[familyOf(colorOf(v))] || "")))].filter((c) => c && FAM_LABEL[wanted] !== c).slice(0, 8);
-    const autresModeles = couleur ? all.filter((p) => fits(p, true, true)).length : 0;
-    return { demande: { couleur, type, taille }, rupture: true, similaires: false, saison,
-      note: "Rupture : aucun modèle disponible pour cette demande dans sa taille. Dis-le et propose : autre couleur du même modèle, ou autre modèle dans la même couleur.",
-      autres_couleurs_meme_modele: autresCouleurs, autres_modeles_meme_couleur: autresModeles, products: [] };
+    const memeCouleur = couleur ? bySeason(all.filter((p) => fits(p, true, true))) : [];
+    const autresModeles = memeCouleur.length;
+    // Modèles proches disponibles dans SA taille : même coupe (autres couleurs), sinon même couleur (autre coupe)
+    let proches = memeModele, pourquoi = "meme_coupe";
+    if (!proches.length) { proches = memeCouleur; pourquoi = "meme_couleur"; }
+    if (!proches.length) { proches = bySeason(all.filter((p) => fits(p, false, true))); pourquoi = "taille"; }
+    const alternatives = proches.slice(0, max).map((p) => ({
+      ...shape(p, shopOrigin, pourquoi === "meme_couleur" ? couleur : "", sizeFor(p)),
+      ...(parMesures ? { taille_conseillee: sizeFor(p) } : {}),
+    }));
+    return { demande: { couleur, type, taille }, rupture: true, similaires: alternatives.length > 0, proches: pourquoi, saison,
+      note: "Rupture pour cette couleur dans sa taille. Les modèles affichés sont des modèles PROCHES disponibles dans sa taille ; propose aussi les autres couleurs.",
+      autres_couleurs_meme_modele: autresCouleurs, autres_modeles_meme_couleur: autresModeles, products: alternatives };
   }
   const similaires = false;
 

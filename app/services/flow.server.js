@@ -77,7 +77,22 @@ export function fastReply(messages, langue) {
       ? "الفريق ديالنا كيجاوبك على واتساب 😊\n[كتبي لينا على واتساب](https://wa.me/212703200695)"
       : "Notre équipe vous répond sur WhatsApp 😊\n[Écrire sur WhatsApp](https://wa.me/212703200695)";
   if (/^(je ne connais pas ma taille|ما عارفاش المقاس)$/i.test(last)) return (langue === "darija" ? Q.ar : Q.fr).mesures;
-  if (!last || last.length > 22) return null;
+  // Demande en texte libre d'un pantalon (« pantalon gris classique », « bghit serwal… ») : question suivante sans IA
+  if (last && last.length > 22) {
+    const lw = last.toLowerCase();
+    const parlePantalon = /pantalon|serwal|sarwal|سروال|سراول|jean|palazzo|jupe|classi|casual|sport|large|droit|[ée]troit|chaud|كلاسيك|كاجوال|واسع|ضيق/.test(lw) || !!familyOf(last);
+    const th = themeOf(last);
+    if (!parlePantalon || (th && !/^Taille/.test(th)) || /[?؟]/.test(last)) return null;
+    const st2 = flowState(messages);
+    const q2 = langue === "darija" ? Q.ar : Q.fr;
+    if (!st2.style) return q2.style;
+    if (!st2.coupe) return q2.coupe;
+    if (!st2.couleur) return q2.couleur;
+    if (!st2.saisonDite && !st2.saisonDemandee) return q2.saison;
+    if (!st2.taille) return q2.taille;
+    return null;
+  }
+  if (!last) return null;
   const st = flowState(messages);
   const qq = langue === "darija" ? Q.ar : Q.fr;
   if (st.autreCouleur) return qq.couleur;
@@ -107,7 +122,7 @@ export function extractParams(messages) {
     if (/étroit|etroit|fente|slim|cigarette|ضيق/.test(u)) out.type = "à fentes";
     else if (/droit|ديريكت/.test(u)) out.type = "droit";
     else if (/large|palazzo|pantalon jupe|واسع/.test(u)) out.type = "large";
-    if (u.length <= 22 && familyOf(u0)) out.couleur = u0;
+    if (familyOf(u0)) out.couleur = u.length <= 22 ? u0 : familyOf(u0);
     if (/demi|نص الموسم/.test(u)) out.saison = "demi-saison";
     else if (/hiver|chaud|شتا|دافي/.test(u)) out.saison = "hiver";
     else if (/été|\bete\b|l[ée]ger|صيف|خفيف/.test(u)) out.saison = "ete";

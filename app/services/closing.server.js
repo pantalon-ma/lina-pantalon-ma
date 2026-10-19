@@ -38,13 +38,14 @@ export function closingText(result, { langue, promoDeja } = {}) {
     const cols = (result.autres_couleurs_meme_modele || []).map((c) => (ar ? COLOR_AR[c] || c : c.toLowerCase()));
     const t = d.taille ? ` ${d.taille}` : "";
     const coul = d.couleur ? (ar ? ` بـ${d.couleur}` : ` en ${d.couleur.toLowerCase()}`) : "";
-    if (cols.length)
-      return ar
-        ? `سمحي ليا، هاد الموديل${coul} ما بقاش فالمقاس${t} ديالك 😔 متوفر فالمقاس${t} : ${cols.join("، ")}. أشمن لون بغيتي؟`
-        : `Désolée, ce modèle${coul} n'est plus disponible dans votre taille${t} 😔 Disponible en${t} : ${cols.join(", ")}. Laquelle vous plaît ?`;
-    return ar
-      ? `سمحي ليا، هاد الموديل${coul} ما بقاش فالمقاس${t} ديالك 😔 بغيتي نشوفو قصة أخرى؟`
-      : `Désolée, ce modèle${coul} n'est plus disponible dans votre taille${t} 😔 Voulez-vous voir une autre coupe ?`;
+    const n = result.products?.length || 0;
+    const head = ar ? `سمحي ليا، ما بقاش${coul} فالمقاس${t} ديالك 😔` : `Désolée, plus de stock${coul} dans votre taille${t} 😔`;
+    const prop = n ? (ar ? ` هادو موديلات قريبة متوفرة فالمقاس${t}.` : ` Voici des modèles proches disponibles en${t}.`) : "";
+    const ask = cols.length
+      ? (ar ? ` ولا ختاري لون آخر : ${cols.join("، ")}.` : ` Ou choisissez une autre couleur : ${cols.join(", ")}.`)
+      : (n ? "" : (ar ? " بغيتي نشوفو قصة أخرى؟" : " Voulez-vous voir une autre coupe ?"));
+    const txt = head + prop + ask;
+    return promoDeja || !n ? txt : `${txt}\n\n${ar ? PROMO_AR : PROMO_FR}`;
   }
   if (result.products?.length) {
     const mesures = result.products.some((p) => p.taille_conseillee);

@@ -17,7 +17,7 @@ describe("réponse rapide", () => {
   it("Noir -> saison", () => expect(fastReply([U("Classique"),U("Large"),U("Noir")])).toMatch(/saison/));
   it("Hiver -> taille", () => expect(fastReply([U("Classique"),U("Large"),U("Noir"),A("Pour quelle saison ?"),U("Hiver")])).toBe("Votre taille ?"));
   it("44 -> IA", () => expect(fastReply([U("Classique"),U("Large"),U("Noir"),U("Hiver"),U("44")])).toBe(null));
-  it("phrase libre -> IA", () => expect(fastReply([U("je veux un pantalon pour le bureau")])).toBe(null));
+  it("phrase libre pantalon -> question type", () => expect(fastReply([U("je veux un pantalon pour le bureau")])).toMatch(/classique, casual ou sport/));
   it("darija", () => expect(fastReply([U("كلاسيك")],"darija")).toMatch(/قصة/));
 });
 describe("rapide autres", () => { it("autres couleurs", () => expect(fastReply([U("Noir"),A("x"),U("Autres couleurs")])).toBe("Quelle couleur ?")); });
@@ -27,4 +27,9 @@ describe("instantané : mesures et taille lettre", () => {
 });
 describe("conseillère", () => {
   it("bouton -> lien WhatsApp immédiat", async () => { const { fastReply } = await import("../app/services/flow.server.js"); expect(fastReply([U("Parler à une conseillère")])).toMatch(/wa\.me\/212703200695/); });
+});
+describe("texte libre", () => {
+  it("pantalon gris classique -> coupe (sans IA)", async () => { const { fastReply } = await import("../app/services/flow.server.js"); expect(fastReply([U("Pantalon gris classique")])).toMatch(/coupe/); });
+  it("question livraison -> IA", async () => { const { fastReply } = await import("../app/services/flow.server.js"); expect(fastReply([U("Vous livrez à Agadir en combien de jours ?")])).toBe(null); });
+  it("recherche directe garde le gris", async () => { const { canSearchDirectly } = await import("../app/services/flow.server.js"); expect(canSearchDirectly([U("Pantalon gris classique"),A("Quelle coupe ?"),U("Large"),A("Pour quelle saison ?"),U("Hiver"),A("Votre taille ?"),U("40")]).couleur).toBe("gris"); });
 });

@@ -255,7 +255,7 @@ async function handleChatSession({
           const summary = result.products?.length ? `\n[Modèles affichés : ${result.products.map((p) => `${p.title} (${p.couleur_proposee}, ${p.taille_proposee})`).join(' ; ')}]` : '';
           await saveMessage(conversationId, 'assistant', JSON.stringify([{ type: 'text', text: text + summary }]));
           let options = quickRepliesFor(text, { langue, produitsAffiches: !!result.products?.length, dernierMessage: userMessage });
-          if (result.rupture && result.autres_couleurs_meme_modele?.length) options = [...result.autres_couleurs_meme_modele.map((c) => (langue === 'darija' ? COLOR_AR[c] || c : c)), langue === 'darija' ? 'قصة أخرى' : 'Autre coupe'];
+          if (result.rupture) options = [...(result.autres_couleurs_meme_modele || []).map((c) => (langue === 'darija' ? COLOR_AR[c] || c : c)), langue === 'darija' ? 'قصة أخرى' : 'Autre coupe', langue === 'darija' ? 'نهضر مع مستشارة' : 'Parler à une conseillère'];
           if (options.length) stream.sendMessage({ type: 'quick_replies', options });
           stream.sendMessage({ type: 'end_turn' });
           return;
@@ -396,8 +396,8 @@ async function handleChatSession({
       const langue = detectLanguage(conversationHistory);
       let options = quickRepliesFor(lastText, { langue, produitsAffiches, dernierMessage: userMessage });
       // Rupture : boutons = les couleurs vraiment disponibles dans sa taille
-      if (derniereRecherche?.rupture && derniereRecherche.autres_couleurs_meme_modele?.length) {
-        options = [...derniereRecherche.autres_couleurs_meme_modele.map((c) => (langue === 'darija' ? COLOR_AR[c] || c : c)), langue === 'darija' ? 'قصة أخرى' : 'Autre coupe'];
+      if (derniereRecherche?.rupture) {
+        options = [...(derniereRecherche.autres_couleurs_meme_modele || []).map((c) => (langue === 'darija' ? COLOR_AR[c] || c : c)), langue === 'darija' ? 'قصة أخرى' : 'Autre coupe', langue === 'darija' ? 'نهضر مع مستشارة' : 'Parler à une conseillère'];
       }
       if (options.length) stream.sendMessage({ type: 'quick_replies', options });
     } catch (e) { console.warn('[Lina] boutons:', e.message); }
