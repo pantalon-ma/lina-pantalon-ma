@@ -109,8 +109,8 @@ export function extractParams(messages) {
     else if (/large|palazzo|pantalon jupe|واسع/.test(u)) out.type = "large";
     if (u.length <= 22 && familyOf(u0)) out.couleur = u0;
     if (/demi|نص الموسم/.test(u)) out.saison = "demi-saison";
-    else if (/hiver|شتا/.test(u)) out.saison = "hiver";
-    else if (/été|\bete\b|صيف/.test(u)) out.saison = "ete";
+    else if (/hiver|chaud|شتا|دافي/.test(u)) out.saison = "hiver";
+    else if (/été|\bete\b|l[ée]ger|صيف|خفيف/.test(u)) out.saison = "ete";
     else if (/peu importe|كيفما كان/.test(u)) out.saison = "";
     const n = u.match(/^\s*(?:taille\s*)?(3[4-9]|[45]\d|60)\s*$/) || u.match(/^\s*(?:taille\s*)?(xs|s|m|l|xl|xxl|2xl|3xl|4xl|5xl)\s*$/i);
     if (n) out.taille = n[1].toUpperCase();
