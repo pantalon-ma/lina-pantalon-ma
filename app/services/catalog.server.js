@@ -287,7 +287,11 @@ function shape(product, shopOrigin, couleur, taille) {
 export async function searchCatalog(shopOrigin, args = {}) {
   const { couleur = "" } = args;
   // « étroit » = nos modèles à fentes
-  const type = String(args.type || "").replace(/\b(etroit|étroit|étroite|etroite)\b/gi, "à fentes");
+  let type = String(args.type || "").replace(/\b(etroit|étroit|étroite|etroite)\b/gi, "à fentes");
+  // « chaud / pour l'hiver » = saison, pas un mot du titre (sinon seuls les « Classique … Chaud » sortent)
+  const veutChaud = /\b(chaud|chaude|chauds|hiver|warm|chauffant)\b|دافي|سخون|الشتا/i.test(type);
+  const veutLeger = /\b(l[ée]ger|l[ée]g[èe]re|frais|fra[îi]che|[ée]t[ée])\b|خفيف|الصيف/i.test(type);
+  type = type.replace(/\b(pantalons?|chaud|chaude|chauds|hiver|warm|chauffant|l[ée]ger|l[ée]g[èe]re|frais|fra[îi]che|[ée]t[ée]|pour l')\b|دافي|سخون|الشتا|خفيف|الصيف/gi, " ").trim();
   const taille = String(args.taille || "").trim();
   const mesures = { tour_hanches: Number(args.tour_hanches) || 0, tour_taille: Number(args.tour_taille) || 0 };
   const parMesures = !taille && (mesures.tour_hanches || mesures.tour_taille);
@@ -296,7 +300,7 @@ export async function searchCatalog(shopOrigin, args = {}) {
   const max = Math.min(Math.max(Number(args.max) || 4, 1), 8);
   const style = normStyle(args.style);
   const sa = String(args.saison || "");
-  const saisonVoulue = /demi|mi.saison|intersaison|نص/i.test(sa) ? "demi" : /ete|été|printemps|صيف/i.test(sa) ? "ete" : /hiver|automne|شتا/i.test(sa) ? "hiver" : currentSeason();
+  const saisonVoulue = veutChaud ? "hiver" : veutLeger ? "ete" : /demi|mi.saison|intersaison|نص/i.test(sa) ? "demi" : /ete|été|printemps|صيف/i.test(sa) ? "ete" : /hiver|automne|شتا/i.test(sa) ? "hiver" : currentSeason();
   let all = (await loadCatalog(shopOrigin)).filter((p) => p.availableForSale);
   if (style) {
     const sameStyle = all.filter((p) => styleOf(p) === style);
@@ -358,6 +362,16 @@ export async function searchCatalog(shopOrigin, args = {}) {
   }
   const similaires = false;
 
+  // Sans type précisé (classique/casual/sport) : on mélange les styles pour montrer de la variété
+  if (!style && found.length > max) {
+    const groups = new Map();
+    for (const p of found) { const k = styleOf(p); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(p); }
+    const mixed = [];
+    while (mixed.length < found.length) {
+      for (const g of groups.values()) if (g.length) mixed.push(g.shift());
+    }
+    found = mixed;
+  }
   const products = found.slice(0, max).map((p) => ({
     ...shape(p, shopOrigin, couleur, sizeFor(p)),
     ...(parMesures ? { taille_conseillee: sizeFor(p) } : {}),

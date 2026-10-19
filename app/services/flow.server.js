@@ -3,6 +3,7 @@
  * et on indique à Lina la prochaine question à poser (la saison une seule fois, « autre couleur »…).
  */
 import { familyOf } from "./catalog.server";
+import { themeOf } from "./faq.server";
 
 const textOf = (m) =>
   typeof m.content === "string" ? m.content
@@ -17,7 +18,7 @@ export function flowState(messages) {
     style: /classi|casual|sport|كلاسيك|كاجوال|سبور|milano|molleton/.test(all),
     coupe: /large|droit|étroit|etroit|fente|palazzo|jupe|slim|cigarette|واسع|ديريكت|ضيق/.test(all),
     couleur: users.some((u) => familyOf(u)) || /peu importe.*couleur|n'importe quelle couleur/.test(all),
-    saisonDite: /hiver|été|\bete\b|demi|saison|peu importe|كيفما كان|شتا|صيف|موسم/.test(all),
+    saisonDite: /hiver|été|\bete\b|demi|saison|peu importe|chaud|l[ée]ger|كيفما كان|شتا|صيف|موسم|دافي|خفيف/.test(all),
     saisonDemandee: assistants.some((a) => /saison|موسم/.test(a.toLowerCase())),
     taille: /\b(3[4-9]|[45]\d|60)\b|hanche|الوراك/.test(all) || users.some((u) => /^\s*(taille\s*)?(xs|s|m|l|xl|xxl|2xl|3xl|4xl|5xl)\s*$/i.test(u)),
     autreCouleur: /autres? couleurs?|لون آخر|ألوان أخرى|الوان اخرى/.test(last) && !familyOf(last),
@@ -30,6 +31,19 @@ export function flowHint(messages, langue) {
   const ar = langue === "darija";
   if (s.autreCouleur) return `\n\n➡️ ÉTAPE IMPOSÉE : la cliente veut une autre couleur. N'appelle PAS l'outil. Réponds UNIQUEMENT : « ${ar ? "أشمن لون؟" : "Quelle couleur ?"} »`;
   if (s.autreCoupe) return `\n\n➡️ ÉTAPE IMPOSÉE : la cliente veut une autre coupe. N'appelle PAS l'outil. Réponds UNIQUEMENT : « ${ar ? "شمن قصة: واسع، ديريكت ولا ضيق؟" : "Quelle coupe : large, droite ou étroite ?"} »`;
+  // La cliente parle d'un pantalon (pas d'une question boutique) : on suit le déroulé dans l'ordre
+  const users = messages.filter((m) => m.role === "user").map(textOf).filter((t) => t.trim());
+  const last = users[users.length - 1] || "";
+  const th = themeOf(last);
+  const questionBoutique = th && !/^Taille/.test(th);
+  if (!questionBoutique) {
+    const q = ar
+      ? { style: "أشمن نوع: كلاسيك، كاجوال ولا سبور؟", coupe: "شمن قصة: واسع، ديريكت ولا ضيق؟", couleur: "أشمن لون؟" }
+      : { style: "Quel type de pantalon : classique, casual ou sport ?", coupe: "Quelle coupe : large, droite ou étroite ?", couleur: "Quelle couleur ?" };
+    const next = !s.style ? "style" : !s.coupe ? "coupe" : !s.couleur ? "couleur" : null;
+    if (next && !s.taille)
+      return `\n\n➡️ ÉTAPE IMPOSÉE : il manque le ${next === "style" ? "type (classique / casual / sport)" : next}. N'appelle PAS l'outil. Réponds UNIQUEMENT (après une salutation de 2 mots si c'est le 1er message) : « ${q[next]} »`;
+  }
   if (s.couleur && !s.saisonDite && !s.saisonDemandee)
     return `\n\n➡️ ÉTAPE IMPOSÉE : la couleur est connue, demande MAINTENANT la saison (une seule fois). N'appelle PAS l'outil. Réponds UNIQUEMENT : « ${ar ? "لأي موسم: الشتا، نص الموسم ولا الصيف؟" : "Pour quelle saison : hiver, demi-saison ou été ?"} »`;
   return "";

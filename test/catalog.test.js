@@ -47,3 +47,9 @@ describe("mesures incomplètes",()=>{
 describe("saison suivante",()=>{
  it("hiver -> demi, demi en octobre -> hiver, demi en avril -> été",async()=>{const {nextSeason:n}=await import("../app/services/catalog.server.js");expect(n("hiver")).toBe("demi");expect(n("ete")).toBe("demi");expect(n("demi",new Date("2026-10-19"))).toBe("hiver");expect(n("demi",new Date("2026-04-10"))).toBe("ete");});
 });
+describe("pantalon chaud", () => {
+  it("« chaud » = saison hiver, pas un mot du titre", async () => {
+    const r = await searchCatalog("https://chaud.ma", { type: "pantalon chaud", taille: "44" });
+    expect(r.saison).toMatch(/hiver/);
+  });
+});

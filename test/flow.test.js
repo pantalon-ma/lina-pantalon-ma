@@ -5,9 +5,10 @@ const U=(t)=>({role:"user",content:t}), A=(t)=>({role:"assistant",content:[{type
 describe("déroulé", () => {
   it("saison après la couleur", () => expect(flowHint([U("Classique"),A("Quelle coupe ?"),U("Large"),A("Quelle couleur ?"),U("Noir")])).toMatch(/saison/));
   it("pas deux fois", () => expect(flowHint([U("Noir"),A("Pour quelle saison : hiver, demi-saison ou été ?"),U("44")])).toBe(""));
-  it("saison déjà dite", () => expect(flowHint([U("pantalon noir pour l'hiver")])).toBe(""));
+  it("saison déjà dite -> on demande le type, pas la saison", () => expect(flowHint([U("pantalon noir pour l'hiver")])).toMatch(/classique, casual ou sport/));
+  it("question boutique -> pas d'étape imposée", () => expect(flowHint([U("La livraison à Agadir prend combien de temps ?")])).toBe(""));
   it("autres couleurs", () => expect(flowHint([U("Noir"),A("x"),U("Autres couleurs")])).toMatch(/Quelle couleur/));
-  it("darija", () => expect(flowHint([U("كحل")],"darija")).toMatch(/موسم/));
+  it("darija", () => expect(flowHint([U("كلاسيك"),U("واسع"),U("كحل")],"darija")).toMatch(/موسم/));
 });
 import { fastReply } from "../app/services/flow.server.js";
 describe("réponse rapide", () => {
