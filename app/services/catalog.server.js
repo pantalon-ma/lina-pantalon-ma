@@ -186,7 +186,7 @@ const COLOR_FAMILIES = [
   ["violet", ["violet", "mauve", "lilas", "parme", "موف", "بنفسجي"]],
   ["leopard", ["leopard", "imprime", "tigre", "panthere", "نمر"]],
 ];
-const familyOf = (s) => {
+export const familyOf = (s) => {
   const w = norm(s);
   let best = null, len = 0;
   for (const [fam, syns] of COLOR_FAMILIES)

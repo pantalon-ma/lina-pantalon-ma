@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
+vi.mock("../app/db.server", () => ({ default: {} }));
 vi.mock("@google/genai", () => ({ GoogleGenAI: class {} }));
 import { detectLanguage } from "../app/services/gemini.server";
 const u=(t)=>[{role:"user",content:t}];

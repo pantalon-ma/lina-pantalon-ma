@@ -6,6 +6,7 @@
 import { GoogleGenAI } from "@google/genai";
 import AppConfig from "./config.server";
 import systemPrompts from "../prompts/prompts.json";
+import { flowHint } from "./flow.server";
 
 const noThinkingModels = new Set(); // modèles qui refusent thinkingBudget: 0
 const FALLBACK_MODELS = ["gemini-flash-lite-latest", "gemini-flash-latest", "gemini-flash-lite-latest"];
@@ -117,7 +118,7 @@ export function createGeminiService(apiKey = process.env.GEMINI_API_KEY) {
     const models = [...new Set([AppConfig.api.defaultModel, ...FALLBACK_MODELS])];
     let stream, lastErr;
     const contents = toGeminiContents(messages);
-    const systemInstruction = getSystemPrompt(promptType) + langHint(messages);
+    const systemInstruction = getSystemPrompt(promptType) + langHint(messages) + flowHint(messages, detectLanguage(messages));
     const geminiTools = toGeminiTools(tools);
     // Gemini refuse un historique qui se termine par un message de Lina
     if (contents.length && contents[contents.length - 1].role === "model") contents.push({ role: "user", parts: [{ text: "..." }] });

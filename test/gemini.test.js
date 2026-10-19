@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
+vi.mock("../app/db.server", () => ({ default: {} }));
 const sent = [];
 const replies = [
   [{ candidates: [{ content: { parts: [{ functionCall: { name: "search_shop_catalog", args: { query: "pantalon large noir" } }, thoughtSignature: "SIG" }] } }] }],
