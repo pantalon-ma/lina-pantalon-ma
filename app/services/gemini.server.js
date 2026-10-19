@@ -17,7 +17,7 @@ export function detectLanguage(messages) {
     if (m.role !== "user") continue;
     const text = typeof m.content === "string" ? m.content
       : Array.isArray(m.content) ? m.content.filter((b) => b.type === "text").map((b) => b.text).join(" ") : "";
-    if (!text.trim()) continue; // résultat d'outil : on remonte
+    if (!/[a-zA-Z\u00C0-\u017F\u0600-\u06FF]/.test(text)) continue; // résultat d'outil ou juste « 44 » : on regarde le message précédent
     if (/[\u0600-\u06FF]/.test(text)) return "darija";
     const t = " " + text.toLowerCase() + " ";
     const darija = /\b(salam|bghit|bghiti|wach|chhal|shhal|kayn|kayna|wa?ss?e3|l9ed|k7el|khder|zre9|byed|3afak|3endk|3ndk|smiya|sarwal|serwal|dyal|dial|ana|nta|nti|labas|mzyan|zwin|zwina|hadi|hada|fin|ach|chno|wakha|safi|bzaf|chi|daba|ghadi|baghya|bghina)\b/.test(t) || /[a-z][379][a-z]/.test(t);
