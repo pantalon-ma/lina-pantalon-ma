@@ -1,6 +1,7 @@
 import { useLoaderData } from "react-router";
 import { authenticate } from "../shopify.server";
 import prisma from "../db.server";
+import { faqReport } from "../services/faq.server";
 
 /** Tableau de bord Lina : demandes clientes, ruptures demandées, modèles cliqués */
 export async function loader({ request }) {
@@ -9,10 +10,11 @@ export async function loader({ request }) {
   const days = Math.min(Math.max(Number(url.searchParams.get("jours")) || 30, 1), 365);
   const since = new Date(Date.now() - days * 24 * 3600 * 1000);
 
-  const [demands, clicks, conversations] = await Promise.all([
+  const [demands, clicks, conversations, userMsgs] = await Promise.all([
     prisma.demandLog.findMany({ where: { createdAt: { gte: since } }, orderBy: { createdAt: "desc" }, take: 5000 }),
     prisma.clickLog.findMany({ where: { createdAt: { gte: since } }, take: 5000 }),
     prisma.conversation.count({ where: { createdAt: { gte: since } } }),
+    prisma.message.findMany({ where: { role: "user", createdAt: { gte: since } }, select: { content: true }, orderBy: { createdAt: "asc" }, take: 20000 }),
   ]);
 
   const top = (items, keyFn, n = 10) => {
@@ -41,6 +43,7 @@ export async function loader({ request }) {
     topTailles: top(demands, (d) => d.taille),
     topClics: top(clicks, (c) => c.title.replace(/^Pantalon Femme - /, "")),
     langues: top(demands, (d) => d.langue, 5),
+    faq: faqReport(userMsgs),
   };
 }
 
@@ -84,6 +87,34 @@ export default function Index() {
             <s-link href="?jours=90">90 jours</s-link>
           </s-paragraph>
         </s-stack>
+      </s-section>
+
+      <s-section heading="❓ Questions les plus posées (à mettre dans la FAQ)">
+        {d.faq.themes.length === 0 ? (
+          <s-paragraph>Pas encore de questions</s-paragraph>
+        ) : (
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+            <tbody>
+              {d.faq.themes.map((f) => (
+                <tr key={f.theme} style={{ borderBottom: "1px solid #eee", verticalAlign: "top" }}>
+                  <td style={{ padding: "8px 4px" }}>
+                    <strong>{f.theme}</strong>
+                    <div style={{ color: "#666", fontSize: 13, marginTop: 4 }}>
+                      {f.exemples.map((e, i) => (<div key={i}>« {e} »</div>))}
+                    </div>
+                  </td>
+                  <td style={{ padding: "8px 4px", textAlign: "right", fontWeight: 600 }}>{f.count}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+        {d.faq.autres.length > 0 && (
+          <div style={{ marginTop: 12, fontSize: 13, color: "#444" }}>
+            <strong>Autres questions récentes :</strong>
+            {d.faq.autres.map((e, i) => (<div key={i}>« {e} »</div>))}
+          </div>
+        )}
       </s-section>
 
       <Table title="🚫 Demandes en rupture (à réassortir)" rows={d.topRuptures} empty="Aucune demande en rupture 🎉" />
