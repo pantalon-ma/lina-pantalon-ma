@@ -239,6 +239,30 @@
       clear: function() {
         document.querySelectorAll('.lina-quick').forEach(function(el) { el.remove(); });
       },
+      // Boutons de couleur affichés dans leur couleur
+      COLORS: [
+        [/bleu marine|marine|مارين|كحلي/i, '#1F2A44'], [/bleu jean|jean/i, '#4A6F9C'], [/bleu ciel|ciel/i, '#9CC6E8'], [/bleu roi/i, '#2347A6'], [/turquoise/i, '#2BB3B1'], [/canard|p[ée]trole/i, '#1F5F6B'], [/bleu|زرق/i, '#3B6BB5'],
+        [/noir|كحل/i, '#111111'], [/blanc|بيض/i, '#FFFFFF', '#222', '#CCCCCC'], [/beige clair/i, '#EADBC4', '#3a2a1a'], [/beige fonc/i, '#BFA27E'], [/beige|بيج/i, '#D9C3A0', '#3a2a1a'], [/camel|كاميل/i, '#C19A6B'],
+        [/marron chocolat|chocolat/i, '#4E2E1E'], [/brique/i, '#9C4A2F'], [/tabac/i, '#8B5A2B'], [/marron|قهوي/i, '#6B4226'],
+        [/bordeaux|grenat|بوردو/i, '#6B1F2E'], [/rouge|حمر/i, '#C62828'], [/vieux rose/i, '#C08081'], [/rose poudr|rose clair/i, '#F3C6CF', '#5a2a35'], [/rose fonc/i, '#C2185B'], [/rose|وردي/i, '#E991A8', '#4a1f2b'],
+        [/violet|mauve|موف/i, '#7E57C2'], [/vert olive|olive|زيتوني/i, '#6B7A3A'], [/vert sauge|sauge/i, '#9CAF88', '#22301c'], [/vert eau/i, '#9ED9C8', '#1c3a32'], [/vert fonc/i, '#1E4D2B'], [/vert|خضر/i, '#2E7D32'],
+        [/gris clair/i, '#C9C9C9', '#222'], [/gris fonc|charbon/i, '#424242'], [/gris|رمادي/i, '#8A8A8A'], [/l[ée]opard|نمر/i, 'repeating-radial-gradient(circle at 30% 40%, #3b2412 0 3px, #c8964f 3px 9px)']
+      ],
+      colorFor: function(label) {
+        for (const row of this.COLORS) {
+          if (row[0].test(label)) {
+            const bg = row[1];
+            let fg = row[2];
+            if (!fg) {
+              const m = /^#([0-9a-f]{6})$/i.exec(bg);
+              if (m) { const n = parseInt(m[1], 16); const l = (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)); fg = l > 160 ? '#222' : '#fff'; }
+              else fg = '#fff';
+            }
+            return { bg: bg, fg: fg, border: row[3] };
+          }
+        }
+        return null;
+      },
       show: function(options, messagesContainer) {
         this.clear();
         if (!options || !options.length) return;
@@ -250,6 +274,13 @@
           b.className = 'lina-quick-btn';
           b.textContent = label;
           if (/[\u0600-\u06FF]/.test(label)) b.dir = 'rtl';
+          const c = ShopAIChat.Quick.colorFor(label);
+          if (c) {
+            b.classList.add('lina-quick-color');
+            b.style.setProperty('background', c.bg, 'important');
+            b.style.setProperty('color', c.fg, 'important');
+            b.style.setProperty('border-color', c.border || c.bg, 'important');
+          }
           b.addEventListener('click', function() {
             const input = ShopAIChat.UI.elements.chatInput;
             input.value = label;
