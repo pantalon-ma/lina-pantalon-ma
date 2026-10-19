@@ -344,7 +344,7 @@ export async function searchCatalog(shopOrigin, args = {}) {
 
   // 2) rupture : on ne montre rien, on donne les choix possibles (autre couleur du même modèle / autre modèle même couleur)
   if (!found.length) {
-    const memeModele = type ? rank(all.filter((p) => fits(p, false, true))).filter((p) => keywordScore(p, type) >= 0.5) : [];
+    const memeModele = type ? rank(all.filter((p) => fits(p, false, true))).filter((p) => keywordScore(p, type) >= 0.5) : bySeason(all.filter((p) => fits(p, false, true)));
     const autresCouleurs = [...new Set(memeModele.flatMap((p) => p.variants.nodes
       .filter((v) => v.availableForSale && sizeMatches(sizeOf(v), sizeFor(p))).map((v) => colorOf(v).replace(/\s?\d+$/, ""))))].filter(Boolean).slice(0, 8);
     const autresModeles = couleur ? all.filter((p) => fits(p, true, true)).length : 0;

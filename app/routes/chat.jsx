@@ -185,6 +185,7 @@ async function handleChatSession({
     let conversationHistory = [];
     let productsToDisplay = [];
     let produitsAffiches = false;
+    let derniereRecherche = null;
 
     // Save user message to the database
     await saveMessage(conversationId, 'user', userMessage);
@@ -268,6 +269,7 @@ async function handleChatSession({
             if (toolName === CATALOG_TOOL_NAME) {
               try {
                 const result = await searchCatalog(shopOrigin, toolArgs);
+                derniereRecherche = result;
                 toolUseResponse = { content: [{ type: "text", text: JSON.stringify(result) }] };
                 // Registre des demandes (rapports) — sans donnée personnelle
                 if (!result.besoin_taille && !result.mesure_manquante) prisma.demandLog.create({ data: {
@@ -340,7 +342,12 @@ async function handleChatSession({
     try {
       const last = finalMessage?.content;
       const lastText = Array.isArray(last) ? last.filter((b) => b.type === 'text').map((b) => b.text).join(' ') : String(last || '');
-      const options = quickRepliesFor(lastText, { langue: detectLanguage(conversationHistory), produitsAffiches, dernierMessage: userMessage });
+      const langue = detectLanguage(conversationHistory);
+      let options = quickRepliesFor(lastText, { langue, produitsAffiches, dernierMessage: userMessage });
+      // Rupture : boutons = les couleurs vraiment disponibles dans sa taille
+      if (derniereRecherche?.rupture && derniereRecherche.autres_couleurs_meme_modele?.length) {
+        options = [...derniereRecherche.autres_couleurs_meme_modele, langue === 'darija' ? 'قصة أخرى' : 'Autre coupe'];
+      }
       if (options.length) stream.sendMessage({ type: 'quick_replies', options });
     } catch (e) { console.warn('[Lina] boutons:', e.message); }
 
