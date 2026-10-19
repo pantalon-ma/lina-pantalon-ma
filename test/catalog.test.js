@@ -29,3 +29,7 @@ describe("saison",()=>{
   const t=r.products.map(p=>p.handle||p.title); expect(t.findIndex(x=>/Flanelle/.test(x))).toBeLessThan(t.findIndex(x=>/Lin$/.test(x)));
  });
 });
+describe("rapprochements",()=>{
+ it("couleurs proches",async()=>{const {colorMatches:m}=await import("../app/services/catalog.server.js");expect(m("Grenat","bordeaux")).toBe(true);expect(m("Bordeaux","grenat")).toBe(true);expect(m("Noir","كحل")).toBe(true);expect(m("Bleu Marine","bleu")).toBe(true);expect(m("Bleu Ciel","bleu marine")).toBe(false);expect(m("Noir","bordeaux")).toBe(false);});
+ it("coupes proches",async()=>{const {keywordScore:k}=await import("../app/services/catalog.server.js");const P=(t)=>({title:t,productType:"",tags:[]});expect(k(P("Pantalon Femme - Palazzo à Plis"),"large")).toBe(1);expect(k(P("Pantalon Femme - Classique à Fentes"),"étroit")).toBe(1);expect(k(P("Pantalon Femme - Jupe Longue"),"large")).toBe(0);});
+});

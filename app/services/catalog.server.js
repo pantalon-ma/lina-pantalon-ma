@@ -118,11 +118,43 @@ function sizeMatches(variantSize, wanted) {
   return parts.includes(w) || parts.includes(num) || parts.join("") === w;
 }
 
-function colorMatches(variantColor, wanted) {
+// Familles de couleurs : la cliente peut dire « grenat », « k7el », « marine »… on rapproche
+const COLOR_FAMILIES = [
+  ["bordeaux", ["bordeaux", "grenat", "lie de vin", "prune", "cerise", "bourgogne", "rouge fonce", "burgundy", "بوردو", "بوردو"]],
+  ["noir", ["noir", "black", "k7el", "kahla", "khal", "كحل", "كحلة", "اسود", "أسود"]],
+  ["blanc", ["blanc", "ecru", "blanc casse", "white", "byed", "بيض", "بيضاء", "ابيض", "أبيض"]],
+  ["beige", ["beige", "camel", "nude", "sable", "creme", "taupe", "بيج"]],
+  ["marron", ["marron", "chocolat", "brun", "tabac", "brique", "camel", "قهوي", "قهوة", "شوكولا"]],
+  ["bleu marine", ["bleu marine", "marine", "bleu nuit", "bleu fonce", "indigo", "navy", "مارين", "كحلي"]],
+  ["bleu", ["bleu", "jean", "denim", "ciel", "turquoise", "canard", "petrole", "zre9", "زرق", "ازرق", "أزرق"]],
+  ["vert", ["vert", "kaki", "khaki", "olive", "sauge", "khder", "خضر", "اخضر", "أخضر"]],
+  ["gris", ["gris", "anthracite", "charbon", "chine", "grey", "gray", "رمادي", "رمادية"]],
+  ["rose", ["rose", "vieux rose", "poudre", "fuchsia", "pink", "وردي", "روز"]],
+  ["rouge", ["rouge", "red", "7mer", "حمر", "احمر", "أحمر"]],
+  ["violet", ["violet", "mauve", "lilas", "parme", "موف", "بنفسجي"]],
+  ["leopard", ["leopard", "imprime", "tigre", "panthere", "نمر"]],
+];
+const familyOf = (s) => {
+  const w = norm(s);
+  let best = null, len = 0;
+  for (const [fam, syns] of COLOR_FAMILIES)
+    for (const syn of syns) {
+      const n = norm(syn);
+      if ((w === n || w.includes(n)) && n.length > len) { best = fam; len = n.length; }
+    }
+  return best;
+};
+
+export function colorMatches(variantColor, wanted) {
   if (!wanted) return true;
   const c = norm(variantColor).replace(/\s?\d+$/, ""); // "vert 1" -> "vert"
   const w = norm(wanted);
-  return c === w || c.startsWith(w + " ") || c.includes(w) || w.includes(c);
+  if (c === w || c.startsWith(w + " ") || c.includes(w) || w.includes(c)) return true;
+  const fw = familyOf(wanted);
+  if (!fw) return false;
+  const fc = familyOf(variantColor);
+  // « bleu » englobe « bleu marine » ; « bordeaux » englobe « grenat »…
+  return fc === fw || (fw === "bleu" && fc === "bleu marine");
 }
 
 // Saison : octobre → mars = automne/hiver ; avril → septembre = printemps/été
@@ -140,11 +172,23 @@ function seasonScore(product, season = currentSeason()) {
   return light ? 1 : warm ? -1 : 0;
 }
 
-function keywordScore(product, type) {
+// Grandes familles de coupes : Large (palazzo, pantalon jupe), Droit, À fentes (cigarette)…
+const TYPE_SYNONYMS = {
+  large: ["large", "palazzo", "pantalon jupe", "wide", "evase"],
+  wide: ["large", "palazzo", "pantalon jupe"],
+  "واسع": ["large", "palazzo", "pantalon jupe"],
+  palazzo: ["palazzo"],
+  etroit: ["fente", "cigarette"], etroite: ["fente", "cigarette"], "ضيق": ["fente", "cigarette"], fente: ["fente", "cigarette"], fentes: ["fente", "cigarette"], cigarette: ["fente", "cigarette"], slim: ["fente", "cigarette"],
+  droit: ["droit"], straight: ["droit"],
+  jupe: ["jupe"],
+  casual: ["casual"], decontracte: ["casual"],
+  classique: ["classique"], habille: ["classique"], chic: ["classique"],
+};
+export function keywordScore(product, type) {
   const words = norm(type).split(" ").filter((x) => x.length > 1 && !STOP.has(x));
   if (!words.length) return 1;
   const hay = norm(`${product.title} ${product.productType} ${(product.tags || []).join(" ")}`);
-  return words.filter((w) => hay.includes(w)).length / words.length;
+  return words.filter((w) => (TYPE_SYNONYMS[w] || [w]).some((alt) => hay.includes(norm(alt)))).length / words.length;
 }
 
 function shape(product, shopOrigin, couleur, taille) {
