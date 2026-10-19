@@ -227,9 +227,15 @@ const seasonsOf = (product) => {
   }
   return out;
 };
+// Saison suivante : hiver → demi-saison ; été → demi-saison ; demi-saison → hiver (automne) ou été (printemps)
+export function nextSeason(season, date = new Date()) {
+  if (season === "hiver" || season === "ete") return "demi";
+  const m = date.getMonth() + 1;
+  return m >= 2 && m <= 7 ? "ete" : "hiver";
+}
 function seasonScore(product, season = currentSeason()) {
   const coll = seasonsOf(product);
-  if (coll.size) return coll.has(season) ? 2 : -1;
+  if (coll.size) return coll.has(season) ? 3 : coll.has(nextSeason(season)) ? 2 : -1;
   if (season === "demi") return 0;
   const hay = norm(`${product.title} ${(product.tags || []).join(" ")}`);
   const warm = WARM.some((w) => hay.includes(w));

@@ -44,3 +44,6 @@ describe("styles",()=>{
 describe("mesures incomplètes",()=>{
  it("hanches seules -> demander le tour de taille",async()=>{const r=await searchCatalog("https://m.ma",{couleur:"noir",type:"large",tour_hanches:123});expect(r.mesure_manquante).toBe("tour_taille");expect(r.products.length).toBe(0);});
 });
+describe("saison suivante",()=>{
+ it("hiver -> demi, demi en octobre -> hiver, demi en avril -> été",async()=>{const {nextSeason:n}=await import("../app/services/catalog.server.js");expect(n("hiver")).toBe("demi");expect(n("ete")).toBe("demi");expect(n("demi",new Date("2026-10-19"))).toBe("hiver");expect(n("demi",new Date("2026-04-10"))).toBe("ete");});
+});
