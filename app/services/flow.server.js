@@ -76,3 +76,39 @@ export function fastReply(messages, langue) {
   if (!s.taille) return q.taille;
   return null; // tout est connu : l'IA lance la recherche
 }
+
+/** Paramètres de recherche déduits des réponses de la cliente (dernière valeur donnée pour chaque étape) */
+export function extractParams(messages) {
+  const users = messages.filter((m) => m.role === "user").map(textOf).map((t) => t.trim()).filter(Boolean);
+  const out = {};
+  for (const u0 of users) {
+    const u = u0.toLowerCase();
+    if (/sport|سبور|milano|molleton/.test(u)) out.style = "sport";
+    else if (/classi|كلاسيك/.test(u)) out.style = "classique";
+    else if (/casual|كاجوال/.test(u)) out.style = "casual";
+    if (/étroit|etroit|fente|slim|cigarette|ضيق/.test(u)) out.type = "à fentes";
+    else if (/droit|ديريكت/.test(u)) out.type = "droit";
+    else if (/large|palazzo|pantalon jupe|واسع/.test(u)) out.type = "large";
+    if (u.length <= 22 && familyOf(u0)) out.couleur = u0;
+    if (/demi|نص الموسم/.test(u)) out.saison = "demi-saison";
+    else if (/hiver|شتا/.test(u)) out.saison = "hiver";
+    else if (/été|\bete\b|صيف/.test(u)) out.saison = "ete";
+    else if (/peu importe|كيفما كان/.test(u)) out.saison = "";
+    const n = u.match(/^\s*(?:taille\s*)?(3[4-9]|[45]\d|60)\s*$/) || u.match(/^\s*(?:taille\s*)?(xs|s|m|l|xl|xxl|2xl|3xl|4xl|5xl)\s*$/i);
+    if (n) out.taille = n[1].toUpperCase();
+  }
+  return out;
+}
+
+/** Recherche directe (sans IA) : la cliente vient de donner la dernière info par un clic / un chiffre */
+export function canSearchDirectly(messages) {
+  const users = messages.filter((m) => m.role === "user").map(textOf).filter((t) => t.trim());
+  const last = (users[users.length - 1] || "").trim();
+  if (!last || last.length > 22) return null;
+  const s = flowState(messages);
+  if (!(s.style && s.coupe && s.couleur && (s.saisonDite || s.saisonDemandee) && s.taille)) return null;
+  if (/hanche|الوراك|cm/i.test(users.join(" "))) return null; // mesures : l'IA s'en charge
+  const p = extractParams(messages);
+  if (!p.taille || !p.couleur) return null;
+  return p;
+}

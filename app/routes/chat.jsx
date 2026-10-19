@@ -13,7 +13,8 @@ import { createGeminiService } from "../services/gemini.server";
 import { createToolService } from "../services/tool.server";
 import { catalogTool, searchCatalog, CATALOG_TOOL_NAME } from "../services/catalog.server";
 import { quickRepliesFor } from "../services/quick-replies.server";
-import { fastReply } from "../services/flow.server";
+import { fastReply, canSearchDirectly } from "../services/flow.server";
+import { closingText, promoDejaAffichee } from "../services/closing.server";
 
 
 const MCP_TOOLS_TTL = 30 * 60 * 1000;
@@ -230,6 +231,32 @@ async function handleChatSession({
       return;
     }
 
+    // Recherche directe (sans IA) quand toutes les infos sont connues : réponse en 1-2 s
+    const direct = canSearchDirectly(conversationHistory);
+    if (direct) {
+      try {
+        const langue = detectLanguage(conversationHistory);
+        const result = await searchCatalog(shopOrigin, direct);
+        logDemand(shopOrigin, direct, result, langue);
+        const text = closingText(result, { langue, promoDeja: promoDejaAffichee(conversationHistory) });
+        if (text) {
+          if (result.products?.length) {
+            stream.sendMessage({ type: 'product_results', products: result.products.slice(0, AppConfig.tools.maxProductsToDisplay) });
+            stream.sendMessage({ type: 'new_message' });
+          }
+          stream.sendMessage({ type: 'chunk', chunk: text });
+          stream.sendMessage({ type: 'message_complete' });
+          const summary = result.products?.length ? `\n[Modèles affichés : ${result.products.map((p) => `${p.title} (${p.couleur_proposee}, ${p.taille_proposee})`).join(' ; ')}]` : '';
+          await saveMessage(conversationId, 'assistant', JSON.stringify([{ type: 'text', text: text + summary }]));
+          let options = quickRepliesFor(text, { langue, produitsAffiches: !!result.products?.length, dernierMessage: userMessage });
+          if (result.rupture && result.autres_couleurs_meme_modele?.length) options = [...result.autres_couleurs_meme_modele, langue === 'darija' ? 'قصة أخرى' : 'Autre coupe'];
+          if (options.length) stream.sendMessage({ type: 'quick_replies', options });
+          stream.sendMessage({ type: 'end_turn' });
+          return;
+        }
+      } catch (e) { console.warn('[Lina] recherche directe:', e.message); }
+    }
+
     // Execute the conversation stream
     let finalMessage = { role: 'user', content: userMessage };
 
@@ -285,17 +312,7 @@ async function handleChatSession({
                 const result = await searchCatalog(shopOrigin, toolArgs);
                 derniereRecherche = result;
                 toolUseResponse = { content: [{ type: "text", text: JSON.stringify(result) }] };
-                // Registre des demandes (rapports) — sans donnée personnelle
-                if (!result.besoin_taille && !result.mesure_manquante) prisma.demandLog.create({ data: {
-                  shop: shopDomainFor(new URL(shopOrigin).hostname),
-                  couleur: String(toolArgs.couleur || "").toLowerCase().slice(0, 60),
-                  type: String(toolArgs.type || "").toLowerCase().slice(0, 80),
-                  taille: String(toolArgs.taille || "").slice(0, 20),
-                  exact: !result.rupture,
-                  nbProposes: result.products.length,
-                  modeles: result.products.map((p) => p.title).join(" | ").slice(0, 1000),
-                  langue: detectLanguage(conversationHistory) || "",
-                } }).catch((e) => console.error("[Lina] log demande:", e.message));
+                logDemand(shopOrigin, toolArgs, result, detectLanguage(conversationHistory));
               } catch (e) {
                 console.error("[Lina] Erreur catalogue:", e);
                 toolUseResponse = { error: { type: "tool_error", data: "Catalogue momentanément indisponible. (" + String(e.message).slice(0, 300) + ")" } };
@@ -347,6 +364,20 @@ async function handleChatSession({
           }
         }
       );
+
+      // Après une recherche : le texte final est écrit par le code (pas de 2e appel IA = plus rapide)
+      if (finalMessage.stop_reason === 'tool_use' && derniereRecherche) {
+        const langue = detectLanguage(conversationHistory);
+        const text = closingText(derniereRecherche, { langue, promoDeja: promoDejaAffichee(conversationHistory) });
+        if (text) {
+          stream.sendMessage({ type: 'chunk', chunk: text });
+          stream.sendMessage({ type: 'message_complete' });
+          const content = [{ type: 'text', text }];
+          conversationHistory.push({ role: 'assistant', content });
+          saveMessage(conversationId, 'assistant', JSON.stringify(content)).catch(() => {});
+          finalMessage = { role: 'assistant', content, stop_reason: 'end_turn' };
+        }
+      }
     }
 
     // Tout est enregistré avant de rendre la main (le message suivant voit l'historique complet)
@@ -379,6 +410,21 @@ async function handleChatSession({
     // The streaming handler takes care of error handling
     throw error;
   }
+}
+
+/** Registre des demandes (rapports) — sans donnée personnelle */
+function logDemand(shopOrigin, args, result, langue) {
+  if (result.besoin_taille || result.mesure_manquante) return;
+  prisma.demandLog.create({ data: {
+    shop: shopDomainFor(new URL(shopOrigin).hostname),
+    couleur: String(args.couleur || "").toLowerCase().slice(0, 60),
+    type: String(args.type || "").toLowerCase().slice(0, 80),
+    taille: String(args.taille || "").slice(0, 20),
+    exact: !result.rupture,
+    nbProposes: result.products.length,
+    modeles: result.products.map((p) => p.title).join(" | ").slice(0, 1000),
+    langue: langue || "",
+  } }).catch((e) => console.error("[Lina] log demande:", e.message));
 }
 
 /**
