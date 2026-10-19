@@ -68,7 +68,7 @@ export const catalogTool = {
       type: { type: "string", description: "Type / coupe / matière souhaités, ex. 'large', 'classique droit', 'palazzo', 'pantalon jupe', 'jean', 'flanelle', 'jupe'. Vide si indifférent." },
       taille: { type: "string", description: "Taille souhaitée, ex. '44' ou 'XL'. Vide si inconnue." },
       style: { type: "string", description: "Type de pantalon : 'classique', 'casual' ou 'sport' (sport = milano, molleton, molleton gratté). Vide si indifférent." },
-      saison: { type: "string", description: "'hiver' ou 'ete' seulement si la cliente demande des modèles pour une saison précise ; sinon vide (saison actuelle par défaut)." },
+      saison: { type: "string", description: "'hiver', 'ete' ou 'demi-saison' seulement si la cliente demande des modèles pour une saison précise ; sinon vide (saison actuelle par défaut)." },
       tour_hanches: { type: "number", description: "Tour de hanches COMPLET de la cliente en cm (mesuré sur le corps), si elle l'a donné. L'outil calcule la taille de chaque modèle." },
       tour_taille: { type: "number", description: "Tour de taille COMPLET de la cliente en cm, si elle l'a donné." },
       max: { type: "number", description: "Nombre maximum de modèles à renvoyer (défaut 4)." },
@@ -118,6 +118,7 @@ const QUERY = `query Catalogue($cursor: String) {
     pageInfo { hasNextPage endCursor }
     nodes {
       id title handle productType tags availableForSale
+      collections(first: 15) { nodes { handle } }
       featuredImage { url }
       variants(first: 250) {
         nodes { id availableForSale price { amount } selectedOptions { name value } image { url } }
@@ -215,7 +216,21 @@ export function currentSeason(date = new Date()) {
   const m = date.getMonth() + 1;
   return m >= 10 || m <= 3 ? "hiver" : "ete";
 }
+// Saisons du site : collections « Sélection HIVER / ETE / DEMI-SAISON » d'abord, sinon matière
+const seasonsOf = (product) => {
+  const handles = (product.collections?.nodes || []).map((c) => norm(c.handle));
+  const out = new Set();
+  for (const h of handles) {
+    if (h.includes("demi saison")) out.add("demi");
+    else if (h.includes("hiver")) out.add("hiver");
+    else if (/\bete\b/.test(h)) out.add("ete");
+  }
+  return out;
+};
 function seasonScore(product, season = currentSeason()) {
+  const coll = seasonsOf(product);
+  if (coll.size) return coll.has(season) ? 2 : -1;
+  if (season === "demi") return 0;
   const hay = norm(`${product.title} ${(product.tags || []).join(" ")}`);
   const warm = WARM.some((w) => hay.includes(w));
   const light = LIGHT.some((w) => hay.split(" ").includes(w) || hay.includes(" " + w));
@@ -274,7 +289,8 @@ export async function searchCatalog(shopOrigin, args = {}) {
   const sizeFor = (p) => taille || (parMesures ? recommendSize(p.title, mesures) : "");
   const max = Math.min(Math.max(Number(args.max) || 4, 1), 8);
   const style = normStyle(args.style);
-  const saisonVoulue = /ete|été|printemps|صيف/i.test(String(args.saison || "")) ? "ete" : /hiver|automne|شتا/i.test(String(args.saison || "")) ? "hiver" : currentSeason();
+  const sa = String(args.saison || "");
+  const saisonVoulue = /demi|mi.saison|intersaison|نص/i.test(sa) ? "demi" : /ete|été|printemps|صيف/i.test(sa) ? "ete" : /hiver|automne|شتا/i.test(sa) ? "hiver" : currentSeason();
   let all = (await loadCatalog(shopOrigin)).filter((p) => p.availableForSale);
   if (style) {
     const sameStyle = all.filter((p) => styleOf(p) === style);
@@ -302,7 +318,7 @@ export async function searchCatalog(shopOrigin, args = {}) {
       .sort((a, b) => b.s - a.s || b.z - a.z)
       .map((x) => x.p);
 
-  const saison = saisonVoulue === "hiver" ? "automne/hiver (modèles chauds proposés en premier)" : "printemps/été (modèles légers proposés en premier)";
+  const saison = saisonVoulue === "hiver" ? "automne/hiver (modèles chauds proposés en premier)" : saisonVoulue === "demi" ? "demi-saison (modèles mi-saison proposés en premier)" : "printemps/été (modèles légers proposés en premier)";
 
   // 0bis) mesures incomplètes : il faut les DEUX (hanches + taille) pour décider la taille finale
   if (!taille && parMesures && !(mesures.tour_hanches && mesures.tour_taille)) {

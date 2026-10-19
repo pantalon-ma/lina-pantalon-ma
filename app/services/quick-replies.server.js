@@ -7,14 +7,14 @@ const FR = {
   coupe: ["Large", "Droite", "Étroite"],
   couleur: ["Noir", "Beige", "Bleu marine", "Gris", "Marron", "Bordeaux", "Vert", "Autre couleur"],
   taille: ["38", "40", "42", "44", "46", "48", "50", "52", "54", "56", "Je ne connais pas ma taille"],
-  apres: ["Autres couleurs", "Modèles d'hiver", "Modèles d'été", "Parler à une conseillère"],
+  apres: ["Autres couleurs", "Modèles d'hiver", "Modèles demi-saison", "Modèles d'été", "Parler à une conseillère"],
 };
 const AR = {
   type: ["كلاسيك", "كاجوال", "سبور"],
   coupe: ["واسع", "ديريكت", "ضيق"],
   couleur: ["كحل", "بيج", "مارين", "رمادي", "قهوي", "بوردو", "خضر", "لون آخر"],
   taille: ["38", "40", "42", "44", "46", "48", "50", "52", "54", "56", "ما عارفاش المقاس"],
-  apres: ["ألوان أخرى", "موديلات الشتا", "موديلات الصيف", "نهضر مع مستشارة"],
+  apres: ["ألوان أخرى", "موديلات الشتا", "موديلات نص الموسم", "موديلات الصيف", "نهضر مع مستشارة"],
 };
 
 export function quickRepliesFor(text, { langue, produitsAffiches } = {}) {
