@@ -19,7 +19,7 @@ export function flowState(messages) {
     couleur: users.some((u) => familyOf(u)) || /peu importe.*couleur|n'importe quelle couleur/.test(all),
     saisonDite: /hiver|été|\bete\b|demi|saison|peu importe|كيفما كان|شتا|صيف|موسم/.test(all),
     saisonDemandee: assistants.some((a) => /saison|موسم/.test(a.toLowerCase())),
-    taille: /\b(3[4-9]|[45]\d|60)\b|\b(xs|s|m|l|xl|2xl|3xl|4xl|5xl)\b|hanche|الوراك/.test(all),
+    taille: /\b(3[4-9]|[45]\d|60)\b|hanche|الوراك/.test(all) || users.some((u) => /^\s*(taille\s*)?(xs|s|m|l|xl|xxl|2xl|3xl|4xl|5xl)\s*$/i.test(u)),
     autreCouleur: /autres? couleurs?|لون آخر|ألوان أخرى|الوان اخرى/.test(last) && !familyOf(last),
     autreCoupe: /autre coupe|قصة أخرى/.test(last),
   };
@@ -44,6 +44,7 @@ const Q = {
     couleur: "Quelle couleur ?",
     saison: "Pour quelle saison : hiver, demi-saison ou été ?",
     taille: "Votre taille ?",
+    mesures: "Votre tour de hanches et votre tour de taille en cm ?",
   },
   ar: {
     style: "أشمن نوع: كلاسيك، كاجوال ولا سبور؟",
@@ -51,11 +52,13 @@ const Q = {
     couleur: "أشمن لون؟",
     saison: "لأي موسم: الشتا، نص الموسم ولا الصيف؟",
     taille: "شنو المقاس ديالك؟",
+    mesures: "شحال الدورة ديال الوراك و الدورة ديال الحزام بالسنتيم؟",
   },
 };
 export function fastReply(messages, langue) {
   const users = messages.filter((m) => m.role === "user").map(textOf).filter((t) => t.trim());
   const last = (users[users.length - 1] || "").trim();
+  if (/^(je ne connais pas ma taille|ما عارفاش المقاس)$/i.test(last)) return (langue === "darija" ? Q.ar : Q.fr).mesures;
   if (!last || last.length > 22) return null;
   const st = flowState(messages);
   const qq = langue === "darija" ? Q.ar : Q.fr;
