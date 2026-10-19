@@ -234,14 +234,15 @@ export function nextSeason(season, date = new Date()) {
   return m >= 2 && m <= 7 ? "ete" : "hiver";
 }
 function seasonScore(product, season = currentSeason()) {
-  const coll = seasonsOf(product);
-  if (coll.size) return coll.has(season) ? 3 : coll.has(nextSeason(season)) ? 2 : -1;
-  if (season === "demi") return 0;
   const hay = norm(`${product.title} ${(product.tags || []).join(" ")}`);
-  const warm = WARM.some((w) => hay.includes(w));
+  const warm = WARM.some((w) => hay.includes(w)) || /molleton|milano/.test(hay);
   const light = LIGHT.some((w) => hay.split(" ").includes(w) || hay.includes(" " + w));
-  if (season === "hiver") return warm ? 1 : light ? -1 : 0;
-  return light ? 1 : warm ? -1 : 0;
+  // matière : départage les modèles de la même collection (en hiver : molleton/milano avant le lin)
+  const mat = season === "hiver" ? (warm ? 1 : light ? -1 : 0) : season === "ete" ? (light ? 1 : warm ? -1 : 0) : 0;
+  const coll = seasonsOf(product);
+  if (coll.size) return (coll.has(season) ? 3 : coll.has(nextSeason(season)) ? 2 : -1) + 0.5 * mat;
+  if (season === "demi") return 0;
+  return mat;
 }
 
 // Grandes familles de coupes : Large (palazzo, pantalon jupe), Droit, À fentes (cigarette)…
