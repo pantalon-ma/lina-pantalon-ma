@@ -679,3 +679,6 @@
 
 .lina-quick-color{text-shadow:0 1px 1px rgba(0,0,0,.15)}
 .lina-quick-color:active,.lina-quick-color:hover{filter:brightness(.92)}
+
+.lina-quick-cut{display:inline-flex !important;align-items:center;gap:6px}
+.lina-cut-ico{flex:0 0 auto}

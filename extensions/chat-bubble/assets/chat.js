@@ -239,6 +239,16 @@
       clear: function() {
         document.querySelectorAll('.lina-quick').forEach(function(el) { el.remove(); });
       },
+      // Petits pantalons dessinés à côté des coupes : large / droite / étroite
+      cutIcon: function(label) {
+        const l = label.toLowerCase();
+        const svg = function(d) { return '<svg class="lina-cut-ico" viewBox="0 0 24 32" width="16" height="22" aria-hidden="true"><path d="' + d + '" fill="currentColor"/></svg>'; };
+        if (/^large$|واسع/.test(l)) return svg('M7 1h10l.6 3H17l6 27h-8.5L12 12l-2.5 19H1L7 4H6.4z');
+        if (/^droite?$|ديريكت/.test(l)) return svg('M6 1h12l.6 3H18l.5 27h-6L12 12l-.5 19h-6L6 4h-.6z');
+        if (/^[ée]troite?$|ضيق/.test(l)) return svg('M6 1h12l.6 3H18l-2.5 27h-3L12 12l-.5 19h-3L6 4h-.6z');
+        return '';
+      },
+
       // Boutons de couleur affichés dans leur couleur
       COLORS: [
         [/bleu marine|marine|مارين|كحلي/i, '#1F2A44'], [/bleu jean|jean/i, '#4A6F9C'], [/bleu ciel|ciel/i, '#9CC6E8'], [/bleu roi/i, '#2347A6'], [/turquoise/i, '#2BB3B1'], [/canard|p[ée]trole/i, '#1F5F6B'], [/bleu|زرق/i, '#3B6BB5'],
@@ -274,6 +284,11 @@
           b.className = 'lina-quick-btn';
           b.textContent = label;
           if (/[\u0600-\u06FF]/.test(label)) b.dir = 'rtl';
+          const icon = ShopAIChat.Quick.cutIcon(label);
+          if (icon) {
+            b.classList.add('lina-quick-cut');
+            b.innerHTML = icon + '<span>' + label + '</span>';
+          }
           const c = ShopAIChat.Quick.colorFor(label);
           if (c) {
             b.classList.add('lina-quick-color');

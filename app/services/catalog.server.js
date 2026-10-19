@@ -345,8 +345,12 @@ export async function searchCatalog(shopOrigin, args = {}) {
   // 2) rupture : on ne montre rien, on donne les choix possibles (autre couleur du même modèle / autre modèle même couleur)
   if (!found.length) {
     const memeModele = type ? rank(all.filter((p) => fits(p, false, true))).filter((p) => keywordScore(p, type) >= 0.5) : bySeason(all.filter((p) => fits(p, false, true)));
+    // couleurs de base (bleu, gris, marron…) disponibles dans sa taille, sans les nuances
+    const FAM_LABEL = { noir: "Noir", blanc: "Blanc", beige: "Beige", marron: "Marron", "bleu marine": "Bleu", bleu: "Bleu", vert: "Vert", gris: "Gris", rose: "Rose", rouge: "Rouge", violet: "Violet", bordeaux: "Bordeaux", leopard: "Léopard" };
+    const wanted = familyOf(couleur);
     const autresCouleurs = [...new Set(memeModele.flatMap((p) => p.variants.nodes
-      .filter((v) => v.availableForSale && sizeMatches(sizeOf(v), sizeFor(p))).map((v) => colorOf(v).replace(/\s?\d+$/, ""))))].filter(Boolean).slice(0, 8);
+      .filter((v) => v.availableForSale && sizeMatches(sizeOf(v), sizeFor(p)))
+      .map((v) => FAM_LABEL[familyOf(colorOf(v))] || "")))].filter((c) => c && FAM_LABEL[wanted] !== c).slice(0, 8);
     const autresModeles = couleur ? all.filter((p) => fits(p, true, true)).length : 0;
     return { demande: { couleur, type, taille }, rupture: true, similaires: false, saison,
       note: "Rupture : aucun modèle disponible pour cette demande dans sa taille. Dis-le et propose : autre couleur du même modèle, ou autre modèle dans la même couleur.",

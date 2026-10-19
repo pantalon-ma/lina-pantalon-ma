@@ -5,19 +5,19 @@
 const FR = {
   type: ["Classique", "Casual", "Sport"],
   coupe: ["Large", "Droite", "Étroite"],
-  couleur: ["Noir", "Beige", "Bleu marine", "Gris", "Marron", "Bordeaux", "Vert", "Autre couleur"],
+  couleur: ["Noir", "Beige", "Bleu", "Gris", "Marron", "Bordeaux", "Vert", "Autre couleur"],
   taille: ["38", "40", "42", "44", "46", "48", "50", "52", "54", "56", "Je ne connais pas ma taille"],
   saison: ["Hiver", "Demi-saison", "Été", "Peu importe"],
-  couleur2: ["Blanc", "Bleu", "Camel", "Rose", "Rouge", "Violet", "Vert olive", "Léopard"],
+  couleur2: ["Blanc", "Camel", "Rose", "Rouge", "Violet", "Léopard"],
   apres: ["Autres couleurs", "Autre coupe", "Parler à une conseillère"],
 };
 const AR = {
   type: ["كلاسيك", "كاجوال", "سبور"],
   coupe: ["واسع", "ديريكت", "ضيق"],
-  couleur: ["كحل", "بيج", "مارين", "رمادي", "قهوي", "بوردو", "خضر", "لون آخر"],
+  couleur: ["كحل", "بيج", "زرق", "رمادي", "قهوي", "بوردو", "خضر", "لون آخر"],
   taille: ["38", "40", "42", "44", "46", "48", "50", "52", "54", "56", "ما عارفاش المقاس"],
   saison: ["الشتا", "نص الموسم", "الصيف", "كيفما كان"],
-  couleur2: ["بيض", "زرق", "كاميل", "وردي", "حمر", "موف", "خضر زيتوني", "نمر"],
+  couleur2: ["بيض", "كاميل", "وردي", "حمر", "موف", "نمر"],
   apres: ["ألوان أخرى", "قصة أخرى", "نهضر مع مستشارة"],
 };
 
@@ -38,3 +38,6 @@ export function quickRepliesFor(text, { langue, produitsAffiches, dernierMessage
   if (/taille|المقاس|مقاس/.test(t)) return L.taille;
   return [];
 }
+
+/** Nom de couleur de base → libellé darija */
+export const COLOR_AR = { Noir: "كحل", Blanc: "بيض", Beige: "بيج", Marron: "قهوي", Bleu: "زرق", Vert: "خضر", Gris: "رمادي", Rose: "وردي", Rouge: "حمر", Violet: "موف", Bordeaux: "بوردو", "Léopard": "نمر" };

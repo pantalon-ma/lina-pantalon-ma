@@ -9,5 +9,5 @@ describe("boutons", () => {
   it("darija coupe", () => expect(q("شمن قصة: واسع، ديريكت ولا ضيق؟", { langue: "darija" })[0]).toBe("واسع"));
   it("après cartes", () => expect(q("Lequel vous plaît ? 😊", { produitsAffiches: true })).toContain("Autres couleurs"));
   it("saison", () => expect(q("Pour quelle saison : hiver, demi-saison ou été ?", {})).toContain("Demi-saison"));
-  it("autre couleur -> autres teintes", () => expect(q("Quelle couleur ?", { dernierMessage: "Autres couleurs" })).toContain("Camel"));
+  it("autre couleur -> autres teintes", () => expect(q("Quelle couleur ?", { dernierMessage: "Autres couleurs" })).toContain("Rose"));
 });

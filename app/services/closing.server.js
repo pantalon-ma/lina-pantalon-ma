@@ -1,3 +1,4 @@
+import { COLOR_AR } from "./quick-replies.server";
 /**
  * Texte de Lina après une recherche, écrit par le code (pas de 2e appel à l'IA = plus rapide).
  */
@@ -34,7 +35,7 @@ export function closingText(result, { langue, promoDeja } = {}) {
     return ar ? "و شحال الدورة ديال الوراك بالسنتيم؟" : "Et votre tour de hanches en cm ?";
   }
   if (result.rupture) {
-    const cols = (result.autres_couleurs_meme_modele || []).map((c) => c.toLowerCase());
+    const cols = (result.autres_couleurs_meme_modele || []).map((c) => (ar ? COLOR_AR[c] || c : c.toLowerCase()));
     const t = d.taille ? ` ${d.taille}` : "";
     const coul = d.couleur ? (ar ? ` بـ${d.couleur}` : ` en ${d.couleur.toLowerCase()}`) : "";
     if (cols.length)
