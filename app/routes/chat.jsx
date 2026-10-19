@@ -19,7 +19,7 @@ import { closingText, promoDejaAffichee } from "../services/closing.server";
 
 const MCP_TOOLS_TTL = 30 * 60 * 1000;
 const mcpToolsCache = new Map(); // shopOrigin -> { at, tools }
-const MAX_HISTORY = 14;
+const MAX_HISTORY = 30;
 const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]);
 
 /**
@@ -195,6 +195,12 @@ async function handleChatSession({
     // Fetch all messages from the database for this conversation
     const dbMessages = await getConversationHistory(conversationId);
 
+    // Historique complet (pour le déroulé : style, coupe, couleur… donnés au début)
+    const fullHistory = dbMessages.map((m) => {
+      let c; try { c = JSON.parse(m.content); if (!Array.isArray(c)) c = m.content; } catch { c = m.content; }
+      return { role: m.role, content: c };
+    });
+
     // Format messages for Claude API (on garde seulement les derniers échanges : plus rapide)
     let recent = dbMessages;
     if (recent.length > MAX_HISTORY) {
@@ -219,7 +225,7 @@ async function handleChatSession({
     });
 
     // Clic sur un bouton du déroulé : réponse immédiate, sans attendre l'IA
-    const fast = fastReply(conversationHistory, detectLanguage(conversationHistory));
+    const fast = fastReply(fullHistory, detectLanguage(conversationHistory));
     if (fast) {
       stream.sendMessage({ type: 'chunk', chunk: fast });
       const content = [{ type: 'text', text: fast }];
@@ -232,13 +238,13 @@ async function handleChatSession({
     }
 
     // Recherche directe (sans IA) quand toutes les infos sont connues : réponse en 1-2 s
-    const direct = canSearchDirectly(conversationHistory);
+    const direct = canSearchDirectly(fullHistory);
     if (direct) {
       try {
         const langue = detectLanguage(conversationHistory);
         const result = await searchCatalog(shopOrigin, direct);
         logDemand(shopOrigin, direct, result, langue);
-        const text = closingText(result, { langue, promoDeja: promoDejaAffichee(conversationHistory) });
+        const text = closingText(result, { langue, promoDeja: promoDejaAffichee(fullHistory) });
         if (text) {
           if (result.products?.length) {
             stream.sendMessage({ type: 'product_results', products: result.products.slice(0, AppConfig.tools.maxProductsToDisplay) });
@@ -368,7 +374,7 @@ async function handleChatSession({
       // Après une recherche : le texte final est écrit par le code (pas de 2e appel IA = plus rapide)
       if (finalMessage.stop_reason === 'tool_use' && derniereRecherche) {
         const langue = detectLanguage(conversationHistory);
-        const text = closingText(derniereRecherche, { langue, promoDeja: promoDejaAffichee(conversationHistory) });
+        const text = closingText(derniereRecherche, { langue, promoDeja: promoDejaAffichee(fullHistory) });
         if (text) {
           stream.sendMessage({ type: 'chunk', chunk: text });
           stream.sendMessage({ type: 'message_complete' });
