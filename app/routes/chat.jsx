@@ -202,6 +202,8 @@ async function handleChatSession({
       let content;
       try {
         content = JSON.parse(dbMessage.content);
+        // « 42 », « true »… sont du texte de la cliente, pas des blocs : on garde la chaîne
+        if (!Array.isArray(content)) content = dbMessage.content;
       } catch (e) {
         content = dbMessage.content;
       }
