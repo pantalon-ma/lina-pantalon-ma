@@ -32,6 +32,26 @@ async function getStorefrontToken(shopDomain) {
 }
 
 
+// Grands types : classique / casual / sport
+const STYLE_WORDS = {
+  sport: ["milano", "molleton"],
+  classique: ["classique", "tailleur", "gabardine", "twill"],
+  casual: ["casual", "palazzo", "pantalon jupe", "jean", "lin", "viscose", "crepe", "velours", "simili", "sky", "john smith", "rayonne", "tencel"],
+};
+export function styleOf(product) {
+  const hay = norm(`${product.title} ${(product.tags || []).join(" ")}`);
+  if (STYLE_WORDS.sport.some((w) => hay.includes(w))) return "sport";
+  if (STYLE_WORDS.classique.some((w) => hay.includes(w))) return "classique";
+  return "casual";
+}
+const normStyle = (s) => {
+  const w = norm(s);
+  if (/sport|milano|molleton|jogg|سبور/.test(w)) return "sport";
+  if (/classi|habill|chic|bureau|كلاسيك/.test(w)) return "classique";
+  if (/casual|decontract|kajwal|كاجوال/.test(w)) return "casual";
+  return "";
+};
+
 export const CATALOG_TOOL_NAME = "rechercher_modeles";
 
 export const catalogTool = {
@@ -47,6 +67,8 @@ export const catalogTool = {
       couleur: { type: "string", description: "Couleur souhaitée en français, ex. 'noir', 'beige', 'bleu marine', 'vert'. Vide si indifférent." },
       type: { type: "string", description: "Type / coupe / matière souhaités, ex. 'large', 'classique droit', 'palazzo', 'pantalon jupe', 'jean', 'flanelle', 'jupe'. Vide si indifférent." },
       taille: { type: "string", description: "Taille souhaitée, ex. '44' ou 'XL'. Vide si inconnue." },
+      style: { type: "string", description: "Type de pantalon : 'classique', 'casual' ou 'sport' (sport = milano, molleton, molleton gratté). Vide si indifférent." },
+      saison: { type: "string", description: "'hiver' ou 'ete' seulement si la cliente demande des modèles pour une saison précise ; sinon vide (saison actuelle par défaut)." },
       tour_hanches: { type: "number", description: "Tour de hanches COMPLET de la cliente en cm (mesuré sur le corps), si elle l'a donné. L'outil calcule la taille de chaque modèle." },
       tour_taille: { type: "number", description: "Tour de taille COMPLET de la cliente en cm, si elle l'a donné." },
       max: { type: "number", description: "Nombre maximum de modèles à renvoyer (défaut 4)." },
@@ -242,14 +264,22 @@ function shape(product, shopOrigin, couleur, taille) {
 }
 
 export async function searchCatalog(shopOrigin, args = {}) {
-  const { couleur = "", type = "" } = args;
+  const { couleur = "" } = args;
+  // « étroit » = nos modèles à fentes
+  const type = String(args.type || "").replace(/\b(etroit|étroit|étroite|etroite)\b/gi, "à fentes");
   const taille = String(args.taille || "").trim();
   const mesures = { tour_hanches: Number(args.tour_hanches) || 0, tour_taille: Number(args.tour_taille) || 0 };
   const parMesures = !taille && (mesures.tour_hanches || mesures.tour_taille);
   // taille voulue pour CE modèle : celle de la cliente, ou celle calculée avec le guide du modèle
   const sizeFor = (p) => taille || (parMesures ? recommendSize(p.title, mesures) : "");
   const max = Math.min(Math.max(Number(args.max) || 4, 1), 8);
-  const all = (await loadCatalog(shopOrigin)).filter((p) => p.availableForSale);
+  const style = normStyle(args.style);
+  const saisonVoulue = /ete|été|printemps|صيف/i.test(String(args.saison || "")) ? "ete" : /hiver|automne|شتا/i.test(String(args.saison || "")) ? "hiver" : currentSeason();
+  let all = (await loadCatalog(shopOrigin)).filter((p) => p.availableForSale);
+  if (style) {
+    const sameStyle = all.filter((p) => styleOf(p) === style);
+    if (sameStyle.length) all = sameStyle;
+  }
 
   const fits = (p, useColor, useSize) => {
     const t = useSize ? sizeFor(p) : "";
@@ -264,15 +294,15 @@ export async function searchCatalog(shopOrigin, args = {}) {
 
   // Classement : d'abord la correspondance avec la demande, puis les modèles de saison en premier
   const bySeason = (list) =>
-    list.map((p) => ({ p, z: seasonScore(p) })).sort((a, b) => b.z - a.z).map((x) => x.p);
+    list.map((p) => ({ p, z: seasonScore(p, saisonVoulue) })).sort((a, b) => b.z - a.z).map((x) => x.p);
   const rank = (list) =>
     list
-      .map((p) => ({ p, s: keywordScore(p, type), z: seasonScore(p) }))
+      .map((p) => ({ p, s: keywordScore(p, type), z: seasonScore(p, saisonVoulue) }))
       .filter((x) => x.s > 0)
       .sort((a, b) => b.s - a.s || b.z - a.z)
       .map((x) => x.p);
 
-  const saison = currentSeason() === "hiver" ? "automne/hiver (modèles chauds proposés en premier)" : "printemps/été (modèles légers proposés en premier)";
+  const saison = saisonVoulue === "hiver" ? "automne/hiver (modèles chauds proposés en premier)" : "printemps/été (modèles légers proposés en premier)";
 
   // 0) sans taille : on ne propose rien, Lina demande d'abord la taille
   if (!taille && !parMesures) {

@@ -38,3 +38,6 @@ describe("taille selon mesures",()=>{
  it("chaque modèle sa taille",async()=>{const {recommendSize:r}=await import("../app/services/catalog.server.js");expect(r("Pantalon Femme - Palazzo à Plis - Crêpe Corée",{tour_hanches:119})).toBe("40");expect(r("Pantalon Femme - Classique à Fentes - Flanelle",{tour_hanches:119})).toBe("50");});
  it("taille fixe : le tour de taille compte",async()=>{const {recommendSize:r}=await import("../app/services/catalog.server.js");expect(r("Pantalon Femme - Classique à Fentes CE Chaud - Flanelle Drapée",{tour_hanches:100,tour_taille:108})).toBe("50");});
 });
+describe("styles",()=>{
+ it("sport/classique/casual",async()=>{const {styleOf:f}=await import("../app/services/catalog.server.js");const P=(t)=>({title:t,tags:[]});expect(f(P("Pantalon Femme - Droit Poches Zippées CE - Molleton"))).toBe("sport");expect(f(P("Pantalon Femme - Large à 2 Boutons - Milano Etirable"))).toBe("sport");expect(f(P("Pantalon Femme - Classique à Fentes - Flanelle"))).toBe("classique");expect(f(P("Pantalon Femme - Palazzo à Plis - Crêpe Corée"))).toBe("casual");});
+});
