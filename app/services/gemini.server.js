@@ -7,6 +7,7 @@ import { GoogleGenAI } from "@google/genai";
 import AppConfig from "./config.server";
 import systemPrompts from "../prompts/prompts.json";
 
+const noThinkingModels = new Set(); // modèles qui refusent thinkingBudget: 0
 const FALLBACK_MODELS = ["gemini-flash-lite-latest", "gemini-flash-latest", "gemini-flash-lite-latest"];
 
 /** Détecte la langue du dernier message de la cliente (français / darija / anglais) */
@@ -29,7 +30,6 @@ export function detectLanguage(messages) {
 
 export function createGeminiService(apiKey = process.env.GEMINI_API_KEY) {
   const ai = new GoogleGenAI({ apiKey });
-  let noThinkingOk = true;
 
   const getSystemPrompt = (promptType) => {
     const raw = systemPrompts.systemPrompts[promptType]?.content ||
@@ -119,17 +119,24 @@ export function createGeminiService(apiKey = process.env.GEMINI_API_KEY) {
     const contents = toGeminiContents(messages);
     const systemInstruction = getSystemPrompt(promptType) + langHint(messages);
     const geminiTools = toGeminiTools(tools);
+    // Gemini refuse un historique qui se termine par un message de Lina
+    if (contents.length && contents[contents.length - 1].role === "model") contents.push({ role: "user", parts: [{ text: "..." }] });
     for (const model of models) {
+      let useThinkingCfg = !noThinkingModels.has(model);
       for (let attempt = 0; attempt < 2 && !stream; attempt++) {
         try {
           const config = { systemInstruction, maxOutputTokens: AppConfig.api.maxTokens, tools: geminiTools };
-          // Réflexion minimale = réponse plus rapide (désactivée si le modèle ne l'accepte pas)
-          if (noThinkingOk) config.thinkingConfig = { thinkingBudget: 0 };
+          // Réflexion minimale = réponse plus rapide (retirée si le modèle ne l'accepte pas)
+          if (useThinkingCfg) config.thinkingConfig = { thinkingBudget: 0 };
           stream = await ai.models.generateContentStream({ model, contents, config });
         } catch (e) {
           lastErr = e;
           const msg = String(e?.message || e);
-          if (noThinkingOk && /thinking/i.test(msg)) { noThinkingOk = false; attempt--; continue; }
+          if (/INVALID_ARGUMENT|invalid argument|thinking/i.test(msg)) {
+            if (useThinkingCfg) { useThinkingCfg = false; noThinkingModels.add(model); attempt--; continue; }
+            console.warn(`[Lina] Gemini ${model} : requête refusée`, msg.slice(0, 200));
+            break; // on essaie le modèle suivant
+          }
           const busy = /503|UNAVAILABLE|overloaded|high demand|429|RESOURCE_EXHAUSTED/i.test(msg);
           console.warn(`[Lina] Gemini ${model} indisponible (essai ${attempt + 1})`);
           const gone = /404|NOT_FOUND|no longer available|not found/i.test(msg);
