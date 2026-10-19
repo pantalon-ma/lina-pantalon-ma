@@ -7,5 +7,7 @@ describe("boutons", () => {
   it("taille", () => expect(q("Votre taille ?", {})).toContain("44"));
   it("mesures -> rien", () => expect(q("Quel est votre tour de hanches et votre tour de taille en cm ?", {})).toEqual([]));
   it("darija coupe", () => expect(q("شمن قصة: واسع، ديريكت ولا ضيق؟", { langue: "darija" })[0]).toBe("واسع"));
-  it("après cartes", () => expect(q("Lequel vous plaît ? 😊", { produitsAffiches: true })).toContain("Modèles d'été"));
+  it("après cartes", () => expect(q("Lequel vous plaît ? 😊", { produitsAffiches: true })).toContain("Autres couleurs"));
+  it("saison", () => expect(q("Pour quelle saison : hiver, demi-saison ou été ?", {})).toContain("Demi-saison"));
+  it("autre couleur -> autres teintes", () => expect(q("Quelle couleur ?", { dernierMessage: "Autres couleurs" })).toContain("Camel"));
 });

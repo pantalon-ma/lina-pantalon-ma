@@ -340,7 +340,7 @@ async function handleChatSession({
     try {
       const last = finalMessage?.content;
       const lastText = Array.isArray(last) ? last.filter((b) => b.type === 'text').map((b) => b.text).join(' ') : String(last || '');
-      const options = quickRepliesFor(lastText, { langue: detectLanguage(conversationHistory), produitsAffiches });
+      const options = quickRepliesFor(lastText, { langue: detectLanguage(conversationHistory), produitsAffiches, dernierMessage: userMessage });
       if (options.length) stream.sendMessage({ type: 'quick_replies', options });
     } catch (e) { console.warn('[Lina] boutons:', e.message); }
 
