@@ -306,7 +306,9 @@ export async function searchCatalog(shopOrigin, args = {}) {
   const veutJupe = /\bjupe\b/i.test(type) && !/pantalon\s+jupe/i.test(type);
   if (!veutJupe) all = all.filter((p) => !/^jupe\b/.test(cleanTitle(p.title)));
   if (style) {
-    const sameStyle = all.filter((p) => styleOf(p) === style);
+    // Casual en hiver : peu de modèles chauds → on ajoute le sport (molleton, milano)
+    const okStyles = style === "casual" && saisonVoulue === "hiver" ? ["casual", "sport"] : [style];
+    const sameStyle = all.filter((p) => okStyles.includes(styleOf(p)));
     if (sameStyle.length) all = sameStyle;
   }
 
@@ -324,9 +326,13 @@ export async function searchCatalog(shopOrigin, args = {}) {
   // Classement : d'abord la correspondance avec la demande, puis les modèles de saison en premier
   const bySeason = (list) =>
     list.map((p) => ({ p, z: seasonScore(p, saisonVoulue) })).sort((a, b) => b.z - a.z).map((x) => x.p);
+  // Sport / casual : large et droit sont des coupes proches → l'autre coupe vient juste après
+  const tNorm = norm(type);
+  const procheType = (style === "sport" || style === "casual") ? (/\blarge\b/.test(tNorm) ? "droit" : /\bdroit/.test(tNorm) ? "large" : "") : "";
+  const scoreType = (p) => keywordScore(p, type) || (procheType ? 0.5 * keywordScore(p, procheType) : 0);
   const rank = (list) =>
     list
-      .map((p) => ({ p, s: keywordScore(p, type), z: seasonScore(p, saisonVoulue) }))
+      .map((p) => ({ p, s: scoreType(p), z: seasonScore(p, saisonVoulue) }))
       .filter((x) => x.s > 0)
       .sort((a, b) => b.s - a.s || b.z - a.z)
       .map((x) => x.p);
