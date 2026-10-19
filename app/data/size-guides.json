@@ -1,0 +1,1673 @@
+[
+ {
+  "modeles": [
+   "Pantalon Jupe - Crêpe Crush à Motifs",
+   "Pantalon Jupe - Jean Tencel",
+   "Pantalon Jupe - Jean Tencel (DC)",
+   "Pantalon Jupe - Rayonne",
+   "Pantalon Jupe - Rayonne (DC)"
+  ],
+  "jupe": false,
+  "elastique": true,
+  "tailles": [
+   {
+    "taille": "38",
+    "alias": null,
+    "a_min": 32,
+    "a_max": 52,
+    "b": 56
+   },
+   {
+    "taille": "40",
+    "alias": null,
+    "a_min": 34,
+    "a_max": 54,
+    "b": 58
+   },
+   {
+    "taille": "42",
+    "alias": null,
+    "a_min": 36,
+    "a_max": 56,
+    "b": 60
+   },
+   {
+    "taille": "44",
+    "alias": null,
+    "a_min": 38,
+    "a_max": 58,
+    "b": 62
+   },
+   {
+    "taille": "46",
+    "alias": null,
+    "a_min": 40,
+    "a_max": 60,
+    "b": 64
+   },
+   {
+    "taille": "48",
+    "alias": null,
+    "a_min": 42,
+    "a_max": 62,
+    "b": 66
+   },
+   {
+    "taille": "50",
+    "alias": null,
+    "a_min": 44,
+    "a_max": 64,
+    "b": 68
+   },
+   {
+    "taille": "52",
+    "alias": null,
+    "a_min": 46,
+    "a_max": 66,
+    "b": 70
+   },
+   {
+    "taille": "54",
+    "alias": null,
+    "a_min": 48,
+    "a_max": 68,
+    "b": 72
+   },
+   {
+    "taille": "56",
+    "alias": null,
+    "a_min": 50,
+    "a_max": 70,
+    "b": 74
+   }
+  ]
+ },
+ {
+  "modeles": [
+   "Casual Large à Ceinture - Crêpe Crush",
+   "Casual Large à Ceinture - Crêpe Crush (DC)"
+  ],
+  "jupe": false,
+  "elastique": true,
+  "tailles": [
+   {
+    "taille": "38",
+    "alias": null,
+    "a_min": 34,
+    "a_max": 44,
+    "b": 48
+   },
+   {
+    "taille": "40",
+    "alias": null,
+    "a_min": 36,
+    "a_max": 46,
+    "b": 50
+   },
+   {
+    "taille": "42",
+    "alias": null,
+    "a_min": 38,
+    "a_max": 48,
+    "b": 52
+   },
+   {
+    "taille": "44",
+    "alias": null,
+    "a_min": 40,
+    "a_max": 50,
+    "b": 54
+   },
+   {
+    "taille": "46",
+    "alias": null,
+    "a_min": 42,
+    "a_max": 52,
+    "b": 56
+   },
+   {
+    "taille": "48",
+    "alias": null,
+    "a_min": 44,
+    "a_max": 54,
+    "b": 58
+   },
+   {
+    "taille": "50",
+    "alias": null,
+    "a_min": 46,
+    "a_max": 56,
+    "b": 60
+   },
+   {
+    "taille": "52",
+    "alias": null,
+    "a_min": 48,
+    "a_max": 58,
+    "b": 62
+   },
+   {
+    "taille": "54",
+    "alias": null,
+    "a_min": 50,
+    "a_max": 60,
+    "b": 64
+   },
+   {
+    "taille": "56",
+    "alias": null,
+    "a_min": 52,
+    "a_max": 62,
+    "b": 66
+   }
+  ]
+ },
+ {
+  "modeles": [
+   "Classique à Fentes - Flanelle",
+   "Classique à Fentes - Flanelle (DC)",
+   "Classique à Fentes Chaud - Flanelle Drapée",
+   "Classique à fentes - Gabardine Tailleur",
+   "Classique à fentes - Gabardine Tailleur (DC)"
+  ],
+  "jupe": false,
+  "elastique": false,
+  "tailles": [
+   {
+    "taille": "38",
+    "alias": null,
+    "a_min": 40,
+    "a_max": 40,
+    "b": 48
+   },
+   {
+    "taille": "40",
+    "alias": null,
+    "a_min": 42,
+    "a_max": 42,
+    "b": 50
+   },
+   {
+    "taille": "42",
+    "alias": null,
+    "a_min": 44,
+    "a_max": 44,
+    "b": 52
+   },
+   {
+    "taille": "44",
+    "alias": null,
+    "a_min": 46,
+    "a_max": 46,
+    "b": 54
+   },
+   {
+    "taille": "46",
+    "alias": null,
+    "a_min": 48,
+    "a_max": 48,
+    "b": 56
+   },
+   {
+    "taille": "48",
+    "alias": null,
+    "a_min": 50,
+    "a_max": 50,
+    "b": 58
+   },
+   {
+    "taille": "50",
+    "alias": null,
+    "a_min": 52,
+    "a_max": 52,
+    "b": 60
+   },
+   {
+    "taille": "52",
+    "alias": null,
+    "a_min": 54,
+    "a_max": 54,
+    "b": 62
+   },
+   {
+    "taille": "54",
+    "alias": null,
+    "a_min": 56,
+    "a_max": 56,
+    "b": 64
+   },
+   {
+    "taille": "56",
+    "alias": null,
+    "a_min": 58,
+    "a_max": 58,
+    "b": 66
+   }
+  ]
+ },
+ {
+  "modeles": [
+   "Pantalon Jupe à  Grands Plis - Crêpe Pradda",
+   "Pantalon Jupe à  Grands Plis - Crêpe Pradda (DC)"
+  ],
+  "jupe": false,
+  "elastique": true,
+  "tailles": [
+   {
+    "taille": "40",
+    "alias": null,
+    "a_min": 34,
+    "a_max": 44,
+    "b": 52
+   },
+   {
+    "taille": "42",
+    "alias": null,
+    "a_min": 36,
+    "a_max": 46,
+    "b": 54
+   },
+   {
+    "taille": "44",
+    "alias": null,
+    "a_min": 38,
+    "a_max": 48,
+    "b": 56
+   },
+   {
+    "taille": "46",
+    "alias": null,
+    "a_min": 40,
+    "a_max": 50,
+    "b": 58
+   },
+   {
+    "taille": "48",
+    "alias": null,
+    "a_min": 42,
+    "a_max": 52,
+    "b": 60
+   },
+   {
+    "taille": "50",
+    "alias": null,
+    "a_min": 44,
+    "a_max": 54,
+    "b": 62
+   },
+   {
+    "taille": "52",
+    "alias": null,
+    "a_min": 46,
+    "a_max": 56,
+    "b": 64
+   },
+   {
+    "taille": "54",
+    "alias": null,
+    "a_min": 48,
+    "a_max": 58,
+    "b": 66
+   },
+   {
+    "taille": "56",
+    "alias": null,
+    "a_min": 50,
+    "a_max": 60,
+    "b": 68
+   }
+  ]
+ },
+ {
+  "modeles": [
+   "Casual Large - Effet Lin",
+   "Casual Large - Effet Lin (DC)",
+   "Casual Large - Viscose Motifs Ecume",
+   "Casual Large - Viscose Motifs Fleurs (DC)",
+   "Casual Large - Viscose Motifs Léopard",
+   "Large Taille Haute - Crêpe Pradda",
+   "Large Taille Haute - Crêpe Pradda (DC)"
+  ],
+  "jupe": false,
+  "elastique": true,
+  "tailles": [
+   {
+    "taille": "38",
+    "alias": null,
+    "a_min": 32,
+    "a_max": 42,
+    "b": 50
+   },
+   {
+    "taille": "40",
+    "alias": null,
+    "a_min": 34,
+    "a_max": 44,
+    "b": 52
+   },
+   {
+    "taille": "42",
+    "alias": null,
+    "a_min": 36,
+    "a_max": 46,
+    "b": 54
+   },
+   {
+    "taille": "44",
+    "alias": null,
+    "a_min": 38,
+    "a_max": 48,
+    "b": 56
+   },
+   {
+    "taille": "46",
+    "alias": null,
+    "a_min": 40,
+    "a_max": 50,
+    "b": 58
+   },
+   {
+    "taille": "48",
+    "alias": null,
+    "a_min": 42,
+    "a_max": 52,
+    "b": 60
+   },
+   {
+    "taille": "50",
+    "alias": null,
+    "a_min": 44,
+    "a_max": 54,
+    "b": 62
+   },
+   {
+    "taille": "52",
+    "alias": null,
+    "a_min": 46,
+    "a_max": 56,
+    "b": 64
+   },
+   {
+    "taille": "54",
+    "alias": null,
+    "a_min": 48,
+    "a_max": 58,
+    "b": 66
+   },
+   {
+    "taille": "56",
+    "alias": null,
+    "a_min": 50,
+    "a_max": 60,
+    "b": 68
+   }
+  ]
+ },
+ {
+  "modeles": [
+   "Palazzo à Plis - Crêpe Corée",
+   "Palazzo à Plis - Crêpe Corée (DC)"
+  ],
+  "jupe": false,
+  "elastique": true,
+  "tailles": [
+   {
+    "taille": "40",
+    "alias": null,
+    "a_min": 36,
+    "a_max": 48,
+    "b": 64
+   },
+   {
+    "taille": "42",
+    "alias": null,
+    "a_min": 38,
+    "a_max": 50,
+    "b": 66
+   },
+   {
+    "taille": "44",
+    "alias": null,
+    "a_min": 40,
+    "a_max": 52,
+    "b": 68
+   },
+   {
+    "taille": "46",
+    "alias": null,
+    "a_min": 42,
+    "a_max": 54,
+    "b": 70
+   },
+   {
+    "taille": "48",
+    "alias": null,
+    "a_min": 44,
+    "a_max": 56,
+    "b": 72
+   },
+   {
+    "taille": "50",
+    "alias": null,
+    "a_min": 46,
+    "a_max": 58,
+    "b": 74
+   },
+   {
+    "taille": "52",
+    "alias": null,
+    "a_min": 48,
+    "a_max": 60,
+    "b": 76
+   },
+   {
+    "taille": "54",
+    "alias": null,
+    "a_min": 50,
+    "a_max": 62,
+    "b": 78
+   },
+   {
+    "taille": "56",
+    "alias": null,
+    "a_min": 52,
+    "a_max": 64,
+    "b": 80
+   }
+  ]
+ },
+ {
+  "modeles": [
+   "Droit Poches Zippées - Molleton Gratté Chaud 🔥",
+   "Droit Poches Zippées - Molleton Gratté Chaud 🔥 (DC)",
+   "Droit Poches Zippées CE - Molleton"
+  ],
+  "jupe": false,
+  "elastique": true,
+  "tailles": [
+   {
+    "taille": "38",
+    "alias": null,
+    "a_min": 34,
+    "a_max": 44,
+    "b": 50
+   },
+   {
+    "taille": "40",
+    "alias": null,
+    "a_min": 36,
+    "a_max": 46,
+    "b": 52
+   },
+   {
+    "taille": "42",
+    "alias": null,
+    "a_min": 38,
+    "a_max": 48,
+    "b": 54
+   },
+   {
+    "taille": "44",
+    "alias": null,
+    "a_min": 40,
+    "a_max": 50,
+    "b": 56
+   },
+   {
+    "taille": "46",
+    "alias": null,
+    "a_min": 42,
+    "a_max": 52,
+    "b": 58
+   },
+   {
+    "taille": "48",
+    "alias": null,
+    "a_min": 44,
+    "a_max": 54,
+    "b": 60
+   },
+   {
+    "taille": "50",
+    "alias": null,
+    "a_min": 46,
+    "a_max": 56,
+    "b": 62
+   },
+   {
+    "taille": "52",
+    "alias": null,
+    "a_min": 48,
+    "a_max": 58,
+    "b": 64
+   },
+   {
+    "taille": "54",
+    "alias": null,
+    "a_min": 50,
+    "a_max": 60,
+    "b": 66
+   },
+   {
+    "taille": "56",
+    "alias": null,
+    "a_min": 52,
+    "a_max": 62,
+    "b": 68
+   }
+  ]
+ },
+ {
+  "modeles": [
+   "Classique Droit - Gabardine Tailleur",
+   "Classique Droit - Gabardine Tailleur (DC)"
+  ],
+  "jupe": false,
+  "elastique": true,
+  "tailles": [
+   {
+    "taille": "40",
+    "alias": "M",
+    "a_min": 36,
+    "a_max": 48,
+    "b": 52
+   },
+   {
+    "taille": "42",
+    "alias": "L",
+    "a_min": 38,
+    "a_max": 50,
+    "b": 54
+   },
+   {
+    "taille": "44",
+    "alias": "XL",
+    "a_min": 40,
+    "a_max": 52,
+    "b": 56
+   },
+   {
+    "taille": "46",
+    "alias": "2XL",
+    "a_min": 42,
+    "a_max": 52,
+    "b": 58
+   },
+   {
+    "taille": "48",
+    "alias": "3XL",
+    "a_min": 44,
+    "a_max": 56,
+    "b": 60
+   },
+   {
+    "taille": "50",
+    "alias": "4XL",
+    "a_min": 46,
+    "a_max": 58,
+    "b": 62
+   },
+   {
+    "taille": "52",
+    "alias": "5XL",
+    "a_min": 48,
+    "a_max": 60,
+    "b": 64
+   }
+  ]
+ },
+ {
+  "modeles": [
+   "Classique Large Brodé - Gabardine Tailleur",
+   "Classique Large Brodé - Gabardine Tailleur (DC)"
+  ],
+  "jupe": false,
+  "elastique": true,
+  "tailles": [
+   {
+    "taille": "40",
+    "alias": null,
+    "a_min": 36,
+    "a_max": 46,
+    "b": 52
+   },
+   {
+    "taille": "42",
+    "alias": null,
+    "a_min": 38,
+    "a_max": 48,
+    "b": 54
+   },
+   {
+    "taille": "44",
+    "alias": null,
+    "a_min": 40,
+    "a_max": 50,
+    "b": 56
+   },
+   {
+    "taille": "46",
+    "alias": null,
+    "a_min": 42,
+    "a_max": 52,
+    "b": 58
+   },
+   {
+    "taille": "48",
+    "alias": null,
+    "a_min": 44,
+    "a_max": 54,
+    "b": 60
+   },
+   {
+    "taille": "50",
+    "alias": null,
+    "a_min": 46,
+    "a_max": 56,
+    "b": 62
+   },
+   {
+    "taille": "52",
+    "alias": null,
+    "a_min": 48,
+    "a_max": 58,
+    "b": 64
+   },
+   {
+    "taille": "54",
+    "alias": null,
+    "a_min": 50,
+    "a_max": 60,
+    "b": 66
+   },
+   {
+    "taille": "56",
+    "alias": null,
+    "a_min": 52,
+    "a_max": 62,
+    "b": 68
+   }
+  ]
+ },
+ {
+  "modeles": [
+   "Classique Droit Chaud - Flanelle Drapée",
+   "Classique Droit Chaud - Flanelle Drapée (DC)"
+  ],
+  "jupe": false,
+  "elastique": true,
+  "tailles": [
+   {
+    "taille": "M",
+    "alias": null,
+    "a_min": 38,
+    "a_max": 48,
+    "b": 54
+   },
+   {
+    "taille": "L",
+    "alias": null,
+    "a_min": 40,
+    "a_max": 50,
+    "b": 56
+   },
+   {
+    "taille": "XL",
+    "alias": null,
+    "a_min": 42,
+    "a_max": 52,
+    "b": 58
+   },
+   {
+    "taille": "2XL",
+    "alias": null,
+    "a_min": 44,
+    "a_max": 54,
+    "b": 60
+   },
+   {
+    "taille": "3XL",
+    "alias": null,
+    "a_min": 46,
+    "a_max": 56,
+    "b": 62
+   },
+   {
+    "taille": "4XL",
+    "alias": null,
+    "a_min": 48,
+    "a_max": 58,
+    "b": 64
+   },
+   {
+    "taille": "5XL",
+    "alias": null,
+    "a_min": 50,
+    "a_max": 60,
+    "b": 66
+   }
+  ]
+ },
+ {
+  "modeles": [
+   "Casual Large - Crêpe Prada",
+   "Casual Large - Crêpe Prada (DC)"
+  ],
+  "jupe": false,
+  "elastique": true,
+  "tailles": [
+   {
+    "taille": "M",
+    "alias": null,
+    "a_min": 38,
+    "a_max": 50,
+    "b": 48
+   },
+   {
+    "taille": "L",
+    "alias": null,
+    "a_min": 40,
+    "a_max": 52,
+    "b": 50
+   },
+   {
+    "taille": "XL",
+    "alias": null,
+    "a_min": 42,
+    "a_max": 54,
+    "b": 52
+   },
+   {
+    "taille": "2XL",
+    "alias": null,
+    "a_min": 44,
+    "a_max": 56,
+    "b": 54
+   },
+   {
+    "taille": "3XL",
+    "alias": null,
+    "a_min": 46,
+    "a_max": 58,
+    "b": 56
+   },
+   {
+    "taille": "4XL",
+    "alias": null,
+    "a_min": 48,
+    "a_max": 60,
+    "b": 58
+   }
+  ]
+ },
+ {
+  "modeles": [
+   "Casual Large à 4 Plis - Effet Lin Crush"
+  ],
+  "jupe": false,
+  "elastique": true,
+  "tailles": [
+   {
+    "taille": "40",
+    "alias": null,
+    "a_min": 36,
+    "a_max": 44,
+    "b": 56
+   },
+   {
+    "taille": "42",
+    "alias": null,
+    "a_min": 38,
+    "a_max": 46,
+    "b": 58
+   },
+   {
+    "taille": "44",
+    "alias": null,
+    "a_min": 40,
+    "a_max": 48,
+    "b": 60
+   },
+   {
+    "taille": "46",
+    "alias": null,
+    "a_min": 42,
+    "a_max": 50,
+    "b": 62
+   },
+   {
+    "taille": "48",
+    "alias": null,
+    "a_min": 44,
+    "a_max": 52,
+    "b": 64
+   },
+   {
+    "taille": "50",
+    "alias": null,
+    "a_min": 46,
+    "a_max": 54,
+    "b": 66
+   },
+   {
+    "taille": "52",
+    "alias": null,
+    "a_min": 48,
+    "a_max": 56,
+    "b": 68
+   },
+   {
+    "taille": "54",
+    "alias": null,
+    "a_min": 50,
+    "a_max": 58,
+    "b": 70
+   },
+   {
+    "taille": "56",
+    "alias": null,
+    "a_min": 52,
+    "a_max": 60,
+    "b": 72
+   }
+  ]
+ },
+ {
+  "modeles": [
+   "Classique Large - Gabardine Douce à Carreaux",
+   "Classique Large - Gabardine Tailleur",
+   "Classique Large à Bouton Doré - Lin"
+  ],
+  "jupe": false,
+  "elastique": true,
+  "tailles": [
+   {
+    "taille": "38",
+    "alias": null,
+    "a_min": 34,
+    "a_max": 44,
+    "b": 50
+   },
+   {
+    "taille": "40",
+    "alias": null,
+    "a_min": 36,
+    "a_max": 46,
+    "b": 52
+   },
+   {
+    "taille": "42",
+    "alias": null,
+    "a_min": 38,
+    "a_max": 48,
+    "b": 54
+   },
+   {
+    "taille": "44",
+    "alias": null,
+    "a_min": 40,
+    "a_max": 50,
+    "b": 56
+   },
+   {
+    "taille": "46",
+    "alias": null,
+    "a_min": 42,
+    "a_max": 52,
+    "b": 58
+   },
+   {
+    "taille": "48",
+    "alias": null,
+    "a_min": 44,
+    "a_max": 54,
+    "b": 60
+   },
+   {
+    "taille": "50",
+    "alias": null,
+    "a_min": 46,
+    "a_max": 56,
+    "b": 62
+   },
+   {
+    "taille": "52",
+    "alias": null,
+    "a_min": 48,
+    "a_max": 58,
+    "b": 64
+   },
+   {
+    "taille": "54",
+    "alias": null,
+    "a_min": 50,
+    "a_max": 60,
+    "b": 66
+   },
+   {
+    "taille": "56",
+    "alias": null,
+    "a_min": 52,
+    "a_max": 62,
+    "b": 68
+   }
+  ]
+ },
+ {
+  "modeles": [
+   "Droit à Zip Latéral - Twill Tailleur Léger"
+  ],
+  "jupe": false,
+  "elastique": true,
+  "tailles": [
+   {
+    "taille": "38",
+    "alias": null,
+    "a_min": 38,
+    "a_max": 46,
+    "b": 52
+   },
+   {
+    "taille": "40",
+    "alias": null,
+    "a_min": 40,
+    "a_max": 48,
+    "b": 54
+   },
+   {
+    "taille": "42",
+    "alias": null,
+    "a_min": 42,
+    "a_max": 50,
+    "b": 56
+   },
+   {
+    "taille": "44",
+    "alias": null,
+    "a_min": 44,
+    "a_max": 52,
+    "b": 58
+   },
+   {
+    "taille": "46",
+    "alias": null,
+    "a_min": 46,
+    "a_max": 54,
+    "b": 60
+   },
+   {
+    "taille": "48",
+    "alias": null,
+    "a_min": 48,
+    "a_max": 56,
+    "b": 62
+   },
+   {
+    "taille": "50",
+    "alias": null,
+    "a_min": 50,
+    "a_max": 58,
+    "b": 64
+   },
+   {
+    "taille": "52",
+    "alias": null,
+    "a_min": 52,
+    "a_max": 60,
+    "b": 66
+   },
+   {
+    "taille": "54",
+    "alias": null,
+    "a_min": 54,
+    "a_max": 62,
+    "b": 68
+   },
+   {
+    "taille": "56",
+    "alias": null,
+    "a_min": 56,
+    "a_max": 64,
+    "b": 70
+   }
+  ]
+ },
+ {
+  "modeles": [
+   "Large à 2 Boutons - Milano Etirable",
+   "Large à Ceinture - Simili Daim Etirable"
+  ],
+  "jupe": false,
+  "elastique": true,
+  "tailles": [
+   {
+    "taille": "38",
+    "alias": null,
+    "a_min": 32,
+    "a_max": 42,
+    "b": 48
+   },
+   {
+    "taille": "40",
+    "alias": null,
+    "a_min": 34,
+    "a_max": 44,
+    "b": 50
+   },
+   {
+    "taille": "42",
+    "alias": null,
+    "a_min": 36,
+    "a_max": 46,
+    "b": 52
+   },
+   {
+    "taille": "44",
+    "alias": null,
+    "a_min": 38,
+    "a_max": 48,
+    "b": 54
+   },
+   {
+    "taille": "46",
+    "alias": null,
+    "a_min": 40,
+    "a_max": 50,
+    "b": 56
+   },
+   {
+    "taille": "48",
+    "alias": null,
+    "a_min": 42,
+    "a_max": 52,
+    "b": 58
+   },
+   {
+    "taille": "50",
+    "alias": null,
+    "a_min": 44,
+    "a_max": 54,
+    "b": 60
+   },
+   {
+    "taille": "52",
+    "alias": null,
+    "a_min": 46,
+    "a_max": 56,
+    "b": 62
+   },
+   {
+    "taille": "54",
+    "alias": null,
+    "a_min": 48,
+    "a_max": 58,
+    "b": 64
+   },
+   {
+    "taille": "56",
+    "alias": null,
+    "a_min": 50,
+    "a_max": 60,
+    "b": 66
+   }
+  ]
+ },
+ {
+  "modeles": [
+   "Classique Large - Gabardine Tailleur Rayé",
+   "Classique Large Chaud - Flanelle Drapée",
+   "Classique Large à Bouton - Flanelle Légère",
+   "Large - Sky Simili Cuir Etirable (DC)"
+  ],
+  "jupe": false,
+  "elastique": true,
+  "tailles": [
+   {
+    "taille": "38",
+    "alias": null,
+    "a_min": 34,
+    "a_max": 44,
+    "b": 50
+   },
+   {
+    "taille": "40",
+    "alias": null,
+    "a_min": 36,
+    "a_max": 46,
+    "b": 52
+   },
+   {
+    "taille": "42",
+    "alias": null,
+    "a_min": 38,
+    "a_max": 48,
+    "b": 54
+   },
+   {
+    "taille": "44",
+    "alias": null,
+    "a_min": 40,
+    "a_max": 50,
+    "b": 56
+   },
+   {
+    "taille": "46",
+    "alias": null,
+    "a_min": 42,
+    "a_max": 52,
+    "b": 58
+   },
+   {
+    "taille": "48",
+    "alias": null,
+    "a_min": 44,
+    "a_max": 54,
+    "b": 60
+   },
+   {
+    "taille": "50",
+    "alias": null,
+    "a_min": 46,
+    "a_max": 56,
+    "b": 62
+   },
+   {
+    "taille": "52",
+    "alias": null,
+    "a_min": 48,
+    "a_max": 58,
+    "b": 64
+   },
+   {
+    "taille": "54",
+    "alias": null,
+    "a_min": 50,
+    "a_max": 60,
+    "b": 66
+   },
+   {
+    "taille": "56",
+    "alias": null,
+    "a_min": 52,
+    "a_max": 62,
+    "b": 68
+   }
+  ]
+ },
+ {
+  "modeles": [
+   "Classique à Fentes CE Chaud - Flanelle Drapée"
+  ],
+  "jupe": false,
+  "elastique": false,
+  "tailles": [
+   {
+    "taille": "38",
+    "alias": null,
+    "a_min": 42,
+    "a_max": 42,
+    "b": 50
+   },
+   {
+    "taille": "40",
+    "alias": null,
+    "a_min": 44,
+    "a_max": 44,
+    "b": 52
+   },
+   {
+    "taille": "42",
+    "alias": null,
+    "a_min": 46,
+    "a_max": 46,
+    "b": 54
+   },
+   {
+    "taille": "44",
+    "alias": null,
+    "a_min": 48,
+    "a_max": 48,
+    "b": 56
+   },
+   {
+    "taille": "46",
+    "alias": null,
+    "a_min": 50,
+    "a_max": 50,
+    "b": 58
+   },
+   {
+    "taille": "48",
+    "alias": null,
+    "a_min": 52,
+    "a_max": 52,
+    "b": 60
+   },
+   {
+    "taille": "50",
+    "alias": null,
+    "a_min": 54,
+    "a_max": 54,
+    "b": 62
+   },
+   {
+    "taille": "52",
+    "alias": null,
+    "a_min": 56,
+    "a_max": 56,
+    "b": 64
+   },
+   {
+    "taille": "54",
+    "alias": null,
+    "a_min": 58,
+    "a_max": 58,
+    "b": 66
+   },
+   {
+    "taille": "56",
+    "alias": null,
+    "a_min": 60,
+    "a_max": 60,
+    "b": 68
+   }
+  ]
+ },
+ {
+  "modeles": [
+   "Jupe Evasée à Ceinture - Crêpe Jacquard"
+  ],
+  "jupe": true,
+  "elastique": true,
+  "tailles": [
+   {
+    "taille": "38",
+    "alias": null,
+    "a_min": 34,
+    "a_max": 44,
+    "b": null
+   },
+   {
+    "taille": "40",
+    "alias": null,
+    "a_min": 36,
+    "a_max": 46,
+    "b": null
+   },
+   {
+    "taille": "42",
+    "alias": null,
+    "a_min": 38,
+    "a_max": 48,
+    "b": null
+   },
+   {
+    "taille": "44",
+    "alias": null,
+    "a_min": 40,
+    "a_max": 50,
+    "b": null
+   },
+   {
+    "taille": "46",
+    "alias": null,
+    "a_min": 42,
+    "a_max": 52,
+    "b": null
+   },
+   {
+    "taille": "48",
+    "alias": null,
+    "a_min": 44,
+    "a_max": 54,
+    "b": null
+   },
+   {
+    "taille": "50",
+    "alias": null,
+    "a_min": 46,
+    "a_max": 56,
+    "b": null
+   },
+   {
+    "taille": "52",
+    "alias": null,
+    "a_min": 48,
+    "a_max": 58,
+    "b": null
+   },
+   {
+    "taille": "54",
+    "alias": null,
+    "a_min": 50,
+    "a_max": 60,
+    "b": null
+   },
+   {
+    "taille": "56",
+    "alias": null,
+    "a_min": 52,
+    "a_max": 62,
+    "b": null
+   }
+  ]
+ },
+ {
+  "modeles": [
+   "Jupe Longue Avec Doublure - Broderie Anglaise"
+  ],
+  "jupe": true,
+  "elastique": true,
+  "tailles": [
+   {
+    "taille": "38",
+    "alias": null,
+    "a_min": 36,
+    "a_max": 46,
+    "b": null
+   },
+   {
+    "taille": "40",
+    "alias": null,
+    "a_min": 38,
+    "a_max": 48,
+    "b": null
+   },
+   {
+    "taille": "42",
+    "alias": null,
+    "a_min": 40,
+    "a_max": 50,
+    "b": null
+   },
+   {
+    "taille": "44",
+    "alias": null,
+    "a_min": 42,
+    "a_max": 52,
+    "b": null
+   },
+   {
+    "taille": "46",
+    "alias": null,
+    "a_min": 44,
+    "a_max": 54,
+    "b": null
+   },
+   {
+    "taille": "48",
+    "alias": null,
+    "a_min": 46,
+    "a_max": 56,
+    "b": null
+   },
+   {
+    "taille": "50",
+    "alias": null,
+    "a_min": 48,
+    "a_max": 58,
+    "b": null
+   },
+   {
+    "taille": "52",
+    "alias": null,
+    "a_min": 50,
+    "a_max": 60,
+    "b": null
+   },
+   {
+    "taille": "54",
+    "alias": null,
+    "a_min": 52,
+    "a_max": 62,
+    "b": null
+   },
+   {
+    "taille": "56",
+    "alias": null,
+    "a_min": 54,
+    "a_max": 64,
+    "b": null
+   }
+  ]
+ },
+ {
+  "modeles": [
+   "Large Taille Haute - John Smith"
+  ],
+  "jupe": false,
+  "elastique": true,
+  "tailles": [
+   {
+    "taille": "38",
+    "alias": null,
+    "a_min": 34,
+    "a_max": 44,
+    "b": 50
+   },
+   {
+    "taille": "40",
+    "alias": null,
+    "a_min": 36,
+    "a_max": 46,
+    "b": 52
+   },
+   {
+    "taille": "42",
+    "alias": null,
+    "a_min": 38,
+    "a_max": 48,
+    "b": 54
+   },
+   {
+    "taille": "44",
+    "alias": null,
+    "a_min": 40,
+    "a_max": 50,
+    "b": 56
+   },
+   {
+    "taille": "46",
+    "alias": null,
+    "a_min": 42,
+    "a_max": 52,
+    "b": 58
+   },
+   {
+    "taille": "48",
+    "alias": null,
+    "a_min": 44,
+    "a_max": 54,
+    "b": 60
+   },
+   {
+    "taille": "50",
+    "alias": null,
+    "a_min": 46,
+    "a_max": 56,
+    "b": 62
+   },
+   {
+    "taille": "52",
+    "alias": null,
+    "a_min": 48,
+    "a_max": 58,
+    "b": 64
+   },
+   {
+    "taille": "54",
+    "alias": null,
+    "a_min": 50,
+    "a_max": 60,
+    "b": 66
+   },
+   {
+    "taille": "56",
+    "alias": null,
+    "a_min": 52,
+    "a_max": 62,
+    "b": 68
+   }
+  ]
+ },
+ {
+  "modeles": [
+   "Jupe Évasée à 3 Boutons - Flanelle (DC)"
+  ],
+  "jupe": true,
+  "elastique": true,
+  "tailles": [
+   {
+    "taille": "38",
+    "alias": null,
+    "a_min": 32,
+    "a_max": 42,
+    "b": null
+   },
+   {
+    "taille": "40",
+    "alias": null,
+    "a_min": 34,
+    "a_max": 44,
+    "b": null
+   },
+   {
+    "taille": "42",
+    "alias": null,
+    "a_min": 36,
+    "a_max": 46,
+    "b": null
+   },
+   {
+    "taille": "44",
+    "alias": null,
+    "a_min": 38,
+    "a_max": 48,
+    "b": null
+   },
+   {
+    "taille": "46",
+    "alias": null,
+    "a_min": 40,
+    "a_max": 50,
+    "b": null
+   },
+   {
+    "taille": "48",
+    "alias": null,
+    "a_min": 42,
+    "a_max": 52,
+    "b": null
+   },
+   {
+    "taille": "50",
+    "alias": null,
+    "a_min": 44,
+    "a_max": 54,
+    "b": null
+   },
+   {
+    "taille": "52",
+    "alias": null,
+    "a_min": 46,
+    "a_max": 56,
+    "b": null
+   }
+  ]
+ },
+ {
+  "modeles": [
+   "Casual Large - Velours Côtelé Doux (DC)"
+  ],
+  "jupe": false,
+  "elastique": true,
+  "tailles": [
+   {
+    "taille": "40",
+    "alias": "S",
+    "a_min": 30,
+    "a_max": 44,
+    "b": 52
+   },
+   {
+    "taille": "42",
+    "alias": "M",
+    "a_min": 32,
+    "a_max": 48,
+    "b": 54
+   },
+   {
+    "taille": "44",
+    "alias": "L",
+    "a_min": 36,
+    "a_max": 52,
+    "b": 56
+   }
+  ]
+ },
+ {
+  "modeles": [
+   "Droit Taille Haute - Jean Étirable"
+  ],
+  "jupe": false,
+  "elastique": false,
+  "tailles": [
+   {
+    "taille": "S",
+    "alias": null,
+    "a_min": 38,
+    "a_max": 38,
+    "b": 46
+   },
+   {
+    "taille": "M",
+    "alias": null,
+    "a_min": 40,
+    "a_max": 40,
+    "b": 48
+   },
+   {
+    "taille": "L",
+    "alias": null,
+    "a_min": 42,
+    "a_max": 42,
+    "b": 50
+   },
+   {
+    "taille": "XL",
+    "alias": null,
+    "a_min": 44,
+    "a_max": 44,
+    "b": 52
+   },
+   {
+    "taille": "2XL",
+    "alias": null,
+    "a_min": 46,
+    "a_max": 46,
+    "b": 54
+   },
+   {
+    "taille": "3XL",
+    "alias": null,
+    "a_min": 48,
+    "a_max": 48,
+    "b": 56
+   },
+   {
+    "taille": "4XL",
+    "alias": null,
+    "a_min": 50,
+    "a_max": 50,
+    "b": 58
+   },
+   {
+    "taille": "5XL",
+    "alias": null,
+    "a_min": 52,
+    "a_max": 52,
+    "b": 60
+   }
+  ]
+ }
+]

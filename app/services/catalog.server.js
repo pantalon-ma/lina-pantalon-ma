@@ -1,4 +1,5 @@
 import prisma from "../db.server";
+import sizeGuides from "../data/size-guides.json";
 import { shopDomainFor } from "./shop-origin.server";
 /**
  * Catalogue pantalon.ma — outil « rechercher_modeles »
@@ -30,6 +31,7 @@ async function getStorefrontToken(shopDomain) {
   return token;
 }
 
+
 export const CATALOG_TOOL_NAME = "rechercher_modeles";
 
 export const catalogTool = {
@@ -45,6 +47,8 @@ export const catalogTool = {
       couleur: { type: "string", description: "Couleur souhaitée en français, ex. 'noir', 'beige', 'bleu marine', 'vert'. Vide si indifférent." },
       type: { type: "string", description: "Type / coupe / matière souhaités, ex. 'large', 'classique droit', 'palazzo', 'pantalon jupe', 'jean', 'flanelle', 'jupe'. Vide si indifférent." },
       taille: { type: "string", description: "Taille souhaitée, ex. '44' ou 'XL'. Vide si inconnue." },
+      tour_hanches: { type: "number", description: "Tour de hanches COMPLET de la cliente en cm (mesuré sur le corps), si elle l'a donné. L'outil calcule la taille de chaque modèle." },
+      tour_taille: { type: "number", description: "Tour de taille COMPLET de la cliente en cm, si elle l'a donné." },
       max: { type: "number", description: "Nombre maximum de modèles à renvoyer (défaut 4)." },
     },
   },
@@ -61,6 +65,31 @@ const norm = (s) =>
 
 const STOP = new Set(["pantalon", "pantalons", "femme", "un", "une", "le", "la", "les", "de", "du", "des", "en", "a", "avec", "et", "modele", "coupe"]);
 const LETTER_SIZES = { S: "38", M: "40", L: "42", XL: "44", "2XL": "46", XXL: "46", "3XL": "48", "4XL": "50", "5XL": "52" };
+
+// ---- Guides des tailles : taille conseillée par modèle selon les mesures de la cliente ----
+const cleanTitle = (t) => norm(String(t || "").replace(/^Pantalon Femme - /i, "").replace(/[^\p{L}\p{N}\s()-]/gu, ""));
+const GUIDE_BY_TITLE = new Map();
+for (const g of sizeGuides) for (const m of g.modeles) GUIDE_BY_TITLE.set(cleanTitle(m), g);
+// Guide par défaut (modèles sans tableau) : demi-hanches du vêtement
+const DEFAULT_GUIDE = { jupe: false, elastique: true, tailles: [38, 40, 42, 44, 46, 48, 50, 52, 54, 56].map((t, i) => ({ taille: String(t), a_min: 32 + 2 * i, a_max: 44 + 2 * i, b: 50 + 2 * i })) };
+
+export function guideFor(title) {
+  return GUIDE_BY_TITLE.get(cleanTitle(title)) || null;
+}
+
+/** Taille conseillée pour un modèle : la plus petite où le vêtement couvre ses hanches (et sa taille) */
+export function recommendSize(title, { tour_hanches, tour_taille } = {}) {
+  const hips = Number(tour_hanches) || 0, waist = Number(tour_taille) || 0;
+  if (!hips && !waist) return null;
+  const g = guideFor(title) || DEFAULT_GUIDE;
+  const halfH = hips / 2, halfW = waist / 2;
+  for (const r of g.tailles) {
+    const okH = !hips || g.jupe || r.b == null || r.b >= halfH;
+    const okW = !waist || (r.a_max > r.a_min ? halfW <= r.a_max : r.a_max >= halfW);
+    if (okH && okW) return r.taille;
+  }
+  return null; // aucune taille du modèle ne convient
+}
 
 const QUERY = `query Catalogue($cursor: String) {
   products(first: 100, after: $cursor) {
@@ -213,17 +242,25 @@ function shape(product, shopOrigin, couleur, taille) {
 }
 
 export async function searchCatalog(shopOrigin, args = {}) {
-  const { couleur = "", type = "", taille = "" } = args;
+  const { couleur = "", type = "" } = args;
+  const taille = String(args.taille || "").trim();
+  const mesures = { tour_hanches: Number(args.tour_hanches) || 0, tour_taille: Number(args.tour_taille) || 0 };
+  const parMesures = !taille && (mesures.tour_hanches || mesures.tour_taille);
+  // taille voulue pour CE modèle : celle de la cliente, ou celle calculée avec le guide du modèle
+  const sizeFor = (p) => taille || (parMesures ? recommendSize(p.title, mesures) : "");
   const max = Math.min(Math.max(Number(args.max) || 4, 1), 8);
   const all = (await loadCatalog(shopOrigin)).filter((p) => p.availableForSale);
 
-  const fits = (p, useColor, useSize) =>
-    p.variants.nodes.some(
+  const fits = (p, useColor, useSize) => {
+    const t = useSize ? sizeFor(p) : "";
+    if (useSize && !t) return false;
+    return p.variants.nodes.some(
       (v) =>
         v.availableForSale &&
         (!useColor || colorMatches(colorOf(v), couleur)) &&
-        (!useSize || sizeMatches(sizeOf(v), taille))
+        (!useSize || sizeMatches(sizeOf(v), t))
     );
+  };
 
   // Classement : d'abord la correspondance avec la demande, puis les modèles de saison en premier
   const bySeason = (list) =>
@@ -238,7 +275,7 @@ export async function searchCatalog(shopOrigin, args = {}) {
   const saison = currentSeason() === "hiver" ? "automne/hiver (modèles chauds proposés en premier)" : "printemps/été (modèles légers proposés en premier)";
 
   // 0) sans taille : on ne propose rien, Lina demande d'abord la taille
-  if (!String(taille).trim()) {
+  if (!taille && !parMesures) {
     return { demande: { couleur, type, taille }, besoin_taille: true, similaires: false, rupture: false,
       note: "Taille inconnue : demande d'abord la taille de la cliente avant de proposer des modèles.", products: [] };
   }
@@ -250,7 +287,7 @@ export async function searchCatalog(shopOrigin, args = {}) {
   if (!found.length) {
     const memeModele = type ? rank(all.filter((p) => fits(p, false, true))).filter((p) => keywordScore(p, type) >= 0.5) : [];
     const autresCouleurs = [...new Set(memeModele.flatMap((p) => p.variants.nodes
-      .filter((v) => v.availableForSale && sizeMatches(sizeOf(v), taille)).map((v) => colorOf(v).replace(/\s?\d+$/, ""))))].filter(Boolean).slice(0, 8);
+      .filter((v) => v.availableForSale && sizeMatches(sizeOf(v), sizeFor(p))).map((v) => colorOf(v).replace(/\s?\d+$/, ""))))].filter(Boolean).slice(0, 8);
     const autresModeles = couleur ? all.filter((p) => fits(p, true, true)).length : 0;
     return { demande: { couleur, type, taille }, rupture: true, similaires: false, saison,
       note: "Rupture : aucun modèle disponible pour cette demande dans sa taille. Dis-le et propose : autre couleur du même modèle, ou autre modèle dans la même couleur.",
@@ -258,7 +295,10 @@ export async function searchCatalog(shopOrigin, args = {}) {
   }
   const similaires = false;
 
-  const products = found.slice(0, max).map((p) => shape(p, shopOrigin, couleur, taille));
+  const products = found.slice(0, max).map((p) => ({
+    ...shape(p, shopOrigin, couleur, sizeFor(p)),
+    ...(parMesures ? { taille_conseillee: sizeFor(p) } : {}),
+  }));
   return {
     demande: { couleur, type, taille },
     saison,

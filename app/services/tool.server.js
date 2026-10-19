@@ -64,6 +64,7 @@ export function createToolService() {
           modeles_affiches: (d.products || []).map((p) => ({
             nom: p.title, prix: p.price, couleur: p.couleur_proposee,
             ...(p.taille_proposee ? { taille: p.taille_proposee } : {}),
+            ...(p.taille_conseillee ? { taille_conseillee_selon_mesures: p.taille_conseillee } : {}),
             ...(p.sizes && p.sizes.length ? { tailles: p.sizes.join(",") } : {}),
           })),
         };

@@ -33,3 +33,8 @@ describe("rapprochements",()=>{
  it("couleurs proches",async()=>{const {colorMatches:m}=await import("../app/services/catalog.server.js");expect(m("Grenat","bordeaux")).toBe(true);expect(m("Bordeaux","grenat")).toBe(true);expect(m("Noir","كحل")).toBe(true);expect(m("Bleu Marine","bleu")).toBe(true);expect(m("Bleu Ciel","bleu marine")).toBe(false);expect(m("Noir","bordeaux")).toBe(false);});
  it("coupes proches",async()=>{const {keywordScore:k}=await import("../app/services/catalog.server.js");const P=(t)=>({title:t,productType:"",tags:[]});expect(k(P("Pantalon Femme - Palazzo à Plis"),"large")).toBe(1);expect(k(P("Pantalon Femme - Classique à Fentes"),"étroit")).toBe(1);expect(k(P("Pantalon Femme - Jupe Longue"),"large")).toBe(0);});
 });
+describe("taille selon mesures",()=>{
+ it("hanches 119 -> 48 sur Fentes CE Chaud (pas 52)",async()=>{const {recommendSize:r}=await import("../app/services/catalog.server.js");expect(r("Pantalon Femme - Classique à Fentes CE Chaud - Flanelle Drapée",{tour_hanches:119})).toBe("48");});
+ it("chaque modèle sa taille",async()=>{const {recommendSize:r}=await import("../app/services/catalog.server.js");expect(r("Pantalon Femme - Palazzo à Plis - Crêpe Corée",{tour_hanches:119})).toBe("40");expect(r("Pantalon Femme - Classique à Fentes - Flanelle",{tour_hanches:119})).toBe("50");});
+ it("taille fixe : le tour de taille compte",async()=>{const {recommendSize:r}=await import("../app/services/catalog.server.js");expect(r("Pantalon Femme - Classique à Fentes CE Chaud - Flanelle Drapée",{tour_hanches:100,tour_taille:108})).toBe("50");});
+});
