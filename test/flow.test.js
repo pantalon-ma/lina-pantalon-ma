@@ -47,3 +47,8 @@ describe("fautes et darija latine", () => {
 describe("phrases courtes libres", () => {
   it("droit classe 44 -> couleur (sans IA)", async () => { const { fastReply } = await import("../app/services/flow.server.js"); expect(fastReply([U("droit classe 44")])).toBe("Quelle couleur ?"); });
 });
+describe("jupes", () => {
+  it("bghit saya -> taille", async () => { const { fastReply } = await import("../app/services/flow.server.js"); expect(fastReply([U("salam bghit saya")])).toBe("Votre taille ?"); });
+  it("falda + 42 -> recherche jupe", async () => { const { canSearchDirectly } = await import("../app/services/flow.server.js"); expect(canSearchDirectly([U("je cherche une falda"),A("Votre taille ?"),U("42")])).toMatchObject({ type: "jupe", taille: "42" }); });
+  it("pantalon jupe reste un pantalon", async () => { const { flowState } = await import("../app/services/flow.server.js"); expect(flowState([U("pantalon jupe noir")]).jupe).toBe(false); });
+});

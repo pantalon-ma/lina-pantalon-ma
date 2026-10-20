@@ -24,6 +24,7 @@ const TYPOS = [
   [/\b(bej|bege|beig|beije)\b/gi, "beige"],
   [/\b(hiv(?:e|è)r|chta|ach[t]?ta|bard|lbard)\b/gi, "hiver"],
   [/\b(ete|été|sif|sayf|sh?rgi)\b/gi, "été"],
+  [/\b(falda|faldas|saya|sayat|sayate|jup|jupes)\b|صاية|صايات|فالدا|جيب/gi, "jupe"],
   [/\b(pantalan|pantallon|pantalo|pentalon|pontalon|pantalons|serwal|sarwal|srawel|sirwal)\b/gi, "pantalon"],
   [/\b(tail|tay|tayl|taiye|ma9as|m9as|me9as|mqas|size)\b/gi, "taille"],
 ];
@@ -48,6 +49,7 @@ export function flowState(messages) {
     taille: /\b(3[4-9]|[45]\d|60)\b|hanche|الوراك/.test(all) || users.some((u) => /^\s*(taille\s*)?(xs|s|m|l|xl|xxl|2xl|3xl|4xl|5xl)\s*$/i.test(u)),
     autreCouleur: /autres? couleurs?|لون آخر|ألوان أخرى|الوان اخرى/.test(last) && !familyOf(last),
     autreCoupe: /autre coupe|قصة أخرى/.test(last),
+    jupe: /\bjupe\b/.test(all) && !/pantalon\s+jupe/.test(all),
   };
 }
 
@@ -112,11 +114,12 @@ export function fastReply(messages, langue) {
   const estBouton = SIMPLE.test(last) || (familyOf(last) && last.split(/\s+/).length <= 3) || /^(3[4-9]|[45]\d|60)$/.test(last.trim());
   if (last && !estBouton && last.length <= 120) {
     const lw = last.toLowerCase();
-    const parlePantalon = /pantalon|serwal|sarwal|سروال|سراول|jean|palazzo|jupe|classi|casual|sport|large|droit|[ée]troit|chaud|كلاسيك|كاجوال|واسع|ضيق/.test(lw) || !!familyOf(last);
+    const parlePantalon = /jupe|pantalon|serwal|sarwal|سروال|سراول|jean|palazzo|jupe|classi|casual|sport|large|droit|[ée]troit|chaud|كلاسيك|كاجوال|واسع|ضيق/.test(lw) || !!familyOf(last);
     const th = themeOf(last);
     if (!parlePantalon || (th && !/^Taille/.test(th)) || /[?؟]/.test(last)) return null;
     const st2 = flowState(messages);
     const q2 = langue === "darija" ? Q.ar : Q.fr;
+    if (st2.jupe) return st2.taille ? null : q2.taille;
     if (!st2.style) return q2.style;
     if (!st2.coupe) return q2.coupe;
     if (!st2.couleur) return q2.couleur;
@@ -207,6 +210,12 @@ export function canSearchDirectly(messages) {
   const lastHasSize = (/(?:taille|t\.?|المقاس|مقاس)\s*:?\s*(3[4-9]|[45]\d|60|xs|s|m|l|xl|xxl|[2-5]xl)\b/i.test(last) || /(?:^|\s)(3[4-9]|[45]\d|60)(?:\s|$)/.test(last)) && !/[?؟]/.test(last);
   if (last.length > 22 && !lastHasMeasure && !lastHasSize) return null;
   const s = flowState(messages);
+  if (s.jupe) {
+    const pj = extractParams(messages);
+    const t = pj.taille || (last.match(/^\s*(3[4-9]|[45]\d|60)\s*$/) || [])[1];
+    if (!t) return null;
+    return { type: "jupe", taille: t, ...(pj.couleur ? { couleur: pj.couleur } : {}) };
+  }
   if (!(s.style && s.coupe && s.couleur && (s.saisonDite || s.saisonDemandee) && (s.taille || mes.tour_hanches || mes.tour_taille))) return null;
   const p = extractParams(messages);
   if (!p.couleur) return null;

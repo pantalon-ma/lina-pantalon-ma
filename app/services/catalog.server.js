@@ -306,6 +306,7 @@ export async function searchCatalog(shopOrigin, args = {}) {
   // Les jupes ne sont proposées que si la cliente demande une jupe (pas « pantalon jupe »)
   const veutJupe = /\bjupe\b/i.test(type) && !/pantalon\s+jupe/i.test(type);
   if (!veutJupe) all = all.filter((p) => !/^jupe\b/.test(cleanTitle(p.title)));
+  else all = all.filter((p) => /^jupe\b/.test(cleanTitle(p.title))); // jupes du site uniquement
   if (style) {
     // Casual en hiver : peu de modèles chauds → on ajoute le sport (molleton, milano)
     const okStyles = style === "casual" && saisonVoulue === "hiver" ? ["casual", "sport"] : [style];
