@@ -1,7 +1,7 @@
 import { useLoaderData } from "react-router";
 import { authenticate } from "../shopify.server";
 import prisma from "../db.server";
-import { faqReport } from "../services/faq.server";
+import { faqReport, unansweredReport } from "../services/faq.server";
 
 /** Tableau de bord Lina : demandes clientes, ruptures demandées, modèles cliqués */
 export async function loader({ request }) {
@@ -10,11 +10,12 @@ export async function loader({ request }) {
   const days = Math.min(Math.max(Number(url.searchParams.get("jours")) || 30, 1), 365);
   const since = new Date(Date.now() - days * 24 * 3600 * 1000);
 
-  const [demands, clicks, conversations, userMsgs] = await Promise.all([
+  const [demands, clicks, conversations, userMsgs, allMsgs] = await Promise.all([
     prisma.demandLog.findMany({ where: { createdAt: { gte: since } }, orderBy: { createdAt: "desc" }, take: 5000 }),
     prisma.clickLog.findMany({ where: { createdAt: { gte: since } }, take: 5000 }),
     prisma.conversation.count({ where: { createdAt: { gte: since } } }),
     prisma.message.findMany({ where: { role: "user", createdAt: { gte: since } }, select: { content: true }, orderBy: { createdAt: "asc" }, take: 20000 }),
+    prisma.message.findMany({ where: { createdAt: { gte: since } }, select: { conversationId: true, role: true, content: true }, orderBy: [{ conversationId: "asc" }, { createdAt: "asc" }], take: 40000 }),
   ]);
 
   const top = (items, keyFn, n = 10) => {
@@ -44,6 +45,7 @@ export async function loader({ request }) {
     topClics: top(clicks, (c) => c.title.replace(/^Pantalon Femme - /, "")),
     langues: top(demands, (d) => d.langue, 5),
     faq: faqReport(userMsgs),
+    sansReponse: unansweredReport(allMsgs, 30),
   };
 }
 
@@ -113,6 +115,20 @@ export default function Index() {
           <div style={{ marginTop: 12, fontSize: 13, color: "#444" }}>
             <strong>Autres questions récentes :</strong>
             {d.faq.autres.map((e, i) => (<div key={i}>« {e} »</div>))}
+          </div>
+        )}
+      </s-section>
+
+      <s-section heading="🤔 Questions auxquelles Lina n'a pas su répondre (à ajouter à sa base)">
+        {d.sansReponse.length === 0 ? (
+          <s-paragraph>Aucune 🎉</s-paragraph>
+        ) : (
+          <div style={{ fontSize: 14 }}>
+            {d.sansReponse.map((q, i) => (
+              <div key={i} style={{ borderBottom: "1px solid #eee", padding: "6px 0" }}>
+                « {q.question} » <span style={{ color: "#888", fontSize: 12 }}>— {q.raison}</span>
+              </div>
+            ))}
           </div>
         )}
       </s-section>

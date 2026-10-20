@@ -48,3 +48,31 @@ export function faqReport(messages, n = 10) {
     autres: other.slice(-8).reverse().map((t) => t.slice(0, 140)),
   };
 }
+
+// ---- Questions auxquelles Lina n'a pas su répondre ----
+const NO_ANSWER = /je ne sais pas|je n['’]ai pas (cette |d['’]|l['’]|les )?info|pas d['’]information|je ne peux pas (vous )?(répondre|confirmer|vérifier)|je ne dispose pas|n['’]est pas précisé|contact\w* (notre|l['’])\s?équipe|notre équipe vous répond|écrire sur whatsapp|ما عنديش|ما عرفتش|معنديش|تواصلي مع|الفريق ديالنا كيجاوبك/i;
+const BUTTON_LIKE = /^(classique|casual( \/ sport)?|sport|large|droite?|[ée]troite?|hiver|[ée]t[ée]|demi-saison|peu importe|autres? couleurs?|autre coupe|autre couleur|parler à une conseill[eè]re|je ne connais pas ma taille|\d{2,3}|[a-zé ]{2,14})$/i;
+const textOfMsg = (c) => { try { const j = JSON.parse(c); if (Array.isArray(j)) return j.filter((b) => b.type === "text").map((b) => b.text).join(" "); } catch {} return String(c || ""); };
+/** Masque téléphones et e-mails éventuels */
+export const anonymise = (t) => String(t).replace(/(\+?\d[\d\s.-]{7,}\d)/g, "[numéro]").replace(/\S+@\S+\.\S+/g, "[e-mail]");
+
+/** messages : [{conversationId, role, content, createdAt}] triés par conversation puis date */
+export function unansweredReport(messages, n = 30) {
+  const out = [];
+  for (let i = 0; i < messages.length; i++) {
+    const m = messages[i];
+    if (m.role !== "user") continue;
+    const q = textOfMsg(m.content).trim();
+    if (!q || q.startsWith("[") || BUTTON_LIKE.test(q) || q.length < 6) continue;
+    // réponse texte suivante de Lina dans la même conversation
+    let rep = null;
+    for (let k = i + 1; k < messages.length && messages[k].conversationId === m.conversationId; k++) {
+      if (messages[k].role === "user" && !String(messages[k].content).trim().startsWith("[")) break;
+      if (messages[k].role === "assistant") { const t = textOfMsg(messages[k].content).trim(); if (t) { rep = t; break; } }
+    }
+    const aidePerso = /conseill|whatsapp|humain|واتساب|مستشارة/i.test(q);
+    if (rep === null) out.push({ question: anonymise(q).slice(0, 200), raison: "pas de réponse (erreur ou attente)" });
+    else if (NO_ANSWER.test(rep) && !aidePerso) out.push({ question: anonymise(q).slice(0, 200), raison: "renvoyée vers l'équipe / info manquante", reponse: anonymise(rep).slice(0, 160) });
+  }
+  return out.slice(-n).reverse();
+}
