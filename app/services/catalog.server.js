@@ -309,7 +309,8 @@ export async function searchCatalog(shopOrigin, args = {}) {
   else all = all.filter((p) => /^jupe\b/.test(cleanTitle(p.title))); // jupes du site uniquement
   if (style) {
     // Casual en hiver : peu de modèles chauds → on ajoute le sport (molleton, milano)
-    const okStyles = style === "casual" && saisonVoulue === "hiver" ? ["casual", "sport"] : [style];
+    // casual et sport = un seul choix pour la cliente
+    const okStyles = style === "casual" || style === "sport" ? ["casual", "sport"] : [style];
     const sameStyle = all.filter((p) => okStyles.includes(styleOf(p)));
     if (sameStyle.length) all = sameStyle;
   }

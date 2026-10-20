@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { quickRepliesFor as q } from "../app/services/quick-replies.server.js";
 describe("boutons", () => {
-  it("type", () => expect(q("Quel type de pantalon : classique, casual ou sport ?", {})[0]).toBe("Classique"));
+  it("type", () => expect(q("Quel type de pantalon : classique ou casual / sport ?", {})[1]).toBe("Casual / Sport"));
   it("coupe", () => expect(q("Quelle coupe : droite ou large ?", {})).toContain("Étroite"));
   it("couleur", () => expect(q("Quelle couleur ?", {})[0]).toBe("Noir"));
   it("taille", () => expect(q("Votre taille ?", {})).toContain("44"));

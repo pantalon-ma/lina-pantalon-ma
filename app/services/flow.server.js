@@ -65,8 +65,8 @@ export function flowHint(messages, langue) {
   const questionBoutique = th && !/^Taille/.test(th);
   if (!questionBoutique) {
     const q = ar
-      ? { style: "أشمن نوع: كلاسيك، كاجوال ولا سبور؟", coupe: "شمن قصة: واسع، ديريكت ولا ضيق؟", couleur: "أشمن لون؟" }
-      : { style: "Quel type de pantalon : classique, casual ou sport ?", coupe: "Quelle coupe : large, droite ou étroite ?", couleur: "Quelle couleur ?" };
+      ? { style: "أشمن نوع: كلاسيك ولا كاجوال / سبور؟", coupe: "شمن قصة: واسع، ديريكت ولا ضيق؟", couleur: "أشمن لون؟" }
+      : { style: "Quel type de pantalon : classique ou casual / sport ?", coupe: "Quelle coupe : large, droite ou étroite ?", couleur: "Quelle couleur ?" };
     const next = !s.style ? "style" : !s.coupe ? "coupe" : !s.couleur ? "couleur" : null;
     if (next && !s.taille)
       return `\n\n➡️ ÉTAPE IMPOSÉE : il manque le ${next === "style" ? "type (classique / casual / sport)" : next}. N'appelle PAS l'outil. Réponds UNIQUEMENT (après une salutation de 2 mots si c'est le 1er message) : « ${q[next]} »`;
@@ -77,10 +77,10 @@ export function flowHint(messages, langue) {
 }
 
 // Réponse immédiate (sans IA) quand la cliente clique un bouton du déroulé : beaucoup plus rapide
-const SIMPLE = /^(classique|casual|sport|large|droite?|[ée]troite?|hiver|[ée]t[ée]|demi[- ]saison|peu importe|كلاسيك|كاجوال|سبور|واسع|ديريكت|ضيق|الشتا|الصيف|نص الموسم|كيفما كان)$/i;
+const SIMPLE = /^(classique|casual\s*\/\s*sport|كاجوال\s*\/\s*سبور|casual|sport|large|droite?|[ée]troite?|hiver|[ée]t[ée]|demi[- ]saison|peu importe|كلاسيك|كاجوال|سبور|واسع|ديريكت|ضيق|الشتا|الصيف|نص الموسم|كيفما كان)$/i;
 const Q = {
   fr: {
-    style: "Quel type de pantalon : classique, casual ou sport ?",
+    style: "Quel type de pantalon : classique ou casual / sport ?",
     coupe: "Quelle coupe : large, droite ou étroite ?",
     couleur: "Quelle couleur ?",
     saison: "Pour quelle saison : hiver, demi-saison ou été ?",
@@ -88,7 +88,7 @@ const Q = {
     mesures: "Votre tour de hanches et votre tour de taille en cm ?",
   },
   ar: {
-    style: "أشمن نوع: كلاسيك، كاجوال ولا سبور؟",
+    style: "أشمن نوع: كلاسيك ولا كاجوال / سبور؟",
     coupe: "شمن قصة: واسع، ديريكت ولا ضيق؟",
     couleur: "أشمن لون؟",
     saison: "لأي موسم: الشتا، نص الموسم ولا الصيف؟",
@@ -151,7 +151,7 @@ export function extractParams(messages) {
   const out = {};
   for (const u0 of users) {
     const u = u0.toLowerCase();
-    if (/sport|سبور|milano|molleton/.test(u)) out.style = "sport";
+    if (/casual|كاجوال|sport|سبور|milano|molleton/.test(u)) out.style = "casual";
     else if (/classi|كلاسيك/.test(u)) out.style = "classique";
     else if (/casual|كاجوال/.test(u)) out.style = "casual";
     if (/étroit|etroit|fente|slim|cigarette|ضيق/.test(u)) out.type = "à fentes";

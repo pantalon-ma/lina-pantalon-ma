@@ -235,7 +235,7 @@
      * Boutons de réponse rapide (type, coupe, couleur, taille…)
      */
     Quick: {
-      WELCOME: ['Classique', 'Casual', 'Sport', 'كلاسيك', 'كاجوال', 'سبور'],
+      WELCOME: ['Classique', 'Casual / Sport', 'كلاسيك', 'كاجوال / سبور'],
       clear: function() {
         document.querySelectorAll('.lina-quick').forEach(function(el) { el.remove(); });
       },
@@ -254,8 +254,7 @@
         const l = label.toLowerCase();
         const e = function(x) { return '<span class="lina-type-ico" aria-hidden="true">' + x + '</span>'; };
         if (/^classique$|كلاسيك/.test(l)) return e('💼');
-        if (/^casual$|كاجوال/.test(l)) return e('👖');
-        if (/^sport$|سبور/.test(l)) return e('👟');
+        if (/casual|sport|كاجوال|سبور/.test(l)) return e('👖👟');
         if (/^hiver$|الشتا/.test(l)) return e('❄️');
         if (/^demi-saison$|نص الموسم/.test(l)) return e('🍂');
         if (/^[ée]t[ée]$|الصيف/.test(l)) return e('☀️');
@@ -764,7 +763,7 @@
 
           // No messages, show welcome message
           if (!data.messages || data.messages.length === 0) {
-            const welcomeMessage = "Bonjour 👋 Je suis Lina, votre conseillère pantalon.ma.\nالسلام 👋 أنا لينا، غادي نعاونك تلقاي السروال اللي يعجبك!\n\nQuel type de pantalon : classique, casual ou sport ?\nأشمن نوع: كلاسيك، كاجوال ولا سبور؟";
+            const welcomeMessage = "Bonjour 👋 Je suis Lina, votre conseillère pantalon.ma.\nالسلام 👋 أنا لينا، غادي نعاونك تلقاي السروال اللي يعجبك!\n\nQuel type de pantalon : classique ou casual / sport ?\nأشمن نوع: كلاسيك ولا كاجوال / سبور؟";
             ShopAIChat.Message.add(welcomeMessage, 'assistant', messagesContainer);
             ShopAIChat.Quick.show(ShopAIChat.Quick.WELCOME, messagesContainer);
             return;
@@ -797,7 +796,7 @@
           }
 
           // Show error and welcome message
-          const welcomeMessage = "Bonjour 👋 Je suis Lina, votre conseillère pantalon.ma.\nالسلام 👋 أنا لينا، غادي نعاونك تلقاي السروال اللي يعجبك!\n\nQuel type de pantalon : classique, casual ou sport ?\nأشمن نوع: كلاسيك، كاجوال ولا سبور؟";
+          const welcomeMessage = "Bonjour 👋 Je suis Lina, votre conseillère pantalon.ma.\nالسلام 👋 أنا لينا، غادي نعاونك تلقاي السروال اللي يعجبك!\n\nQuel type de pantalon : classique ou casual / sport ?\nأشمن نوع: كلاسيك ولا كاجوال / سبور؟";
           ShopAIChat.Message.add(welcomeMessage, 'assistant', messagesContainer);
             ShopAIChat.Quick.show(ShopAIChat.Quick.WELCOME, messagesContainer);
 
@@ -1005,7 +1004,7 @@
         this.API.fetchChatHistory(conversationId, this.UI.elements.messagesContainer);
       } else {
         // No previous conversation, show welcome message
-        const welcomeMessage = "Bonjour 👋 Je suis Lina, votre conseillère pantalon.ma.\nالسلام 👋 أنا لينا، غادي نعاونك تلقاي السروال اللي يعجبك!\n\nQuel type de pantalon : classique, casual ou sport ?\nأشمن نوع: كلاسيك، كاجوال ولا سبور؟";
+        const welcomeMessage = "Bonjour 👋 Je suis Lina, votre conseillère pantalon.ma.\nالسلام 👋 أنا لينا، غادي نعاونك تلقاي السروال اللي يعجبك!\n\nQuel type de pantalon : classique ou casual / sport ?\nأشمن نوع: كلاسيك ولا كاجوال / سبور؟";
         this.Message.add(welcomeMessage, 'assistant', this.UI.elements.messagesContainer);
         this.Quick.show(this.Quick.WELCOME, this.UI.elements.messagesContainer);
       }

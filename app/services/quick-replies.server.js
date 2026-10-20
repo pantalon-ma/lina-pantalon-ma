@@ -3,7 +3,7 @@
  * Déduits de la question posée par Lina, dans la langue de la cliente.
  */
 const FR = {
-  type: ["Classique", "Casual", "Sport"],
+  type: ["Classique", "Casual / Sport"],
   coupe: ["Large", "Droite", "Étroite"],
   couleur: ["Noir", "Beige", "Bleu", "Gris", "Marron", "Bordeaux", "Vert", "Autre couleur"],
   taille: ["38", "40", "42", "44", "46", "48", "50", "52", "54", "56", "Je ne connais pas ma taille"],
@@ -12,7 +12,7 @@ const FR = {
   apres: ["Autres couleurs", "Autre coupe", "Parler à une conseillère"],
 };
 const AR = {
-  type: ["كلاسيك", "كاجوال", "سبور"],
+  type: ["كلاسيك", "كاجوال / سبور"],
   coupe: ["واسع", "ديريكت", "ضيق"],
   couleur: ["كحل", "بيج", "زرق", "رمادي", "قهوي", "بوردو", "خضر", "لون آخر"],
   taille: ["38", "40", "42", "44", "46", "48", "50", "52", "54", "56", "ما عارفاش المقاس"],
