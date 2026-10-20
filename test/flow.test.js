@@ -40,3 +40,7 @@ describe("mesures sans IA", () => {
   it("hanches puis taille", async () => { const { canSearchDirectly: c } = await import("../app/services/flow.server.js"); expect(c([...base,U("Tour hanche 123"),A("Et votre tour de taille en cm ?"),U("104")])).toMatchObject({tour_hanches:123,tour_taille:104}); });
   it("une seule -> recherche (l'outil demandera l'autre)", async () => { const { canSearchDirectly: c } = await import("../app/services/flow.server.js"); const r=c([...base,U("Tour hanche 123")]); expect(r.tour_hanches).toBe(123); expect(r.tour_taille).toBeUndefined(); });
 });
+describe("fautes et darija latine", () => {
+  it("bghit serwal k7el wase3 classik -> saison (sans IA)", async () => { const { fastReply } = await import("../app/services/flow.server.js"); expect(fastReply([U("salam bghit serwal k7el wase3 classik")])).toMatch(/saison/); });
+  it("phrase complète avec taille -> recherche directe", async () => { const { canSearchDirectly } = await import("../app/services/flow.server.js"); expect(canSearchDirectly([U("je veux un pantalan noire larg classik pour l'hiver taille 46")])).toMatchObject({ style: "classique", type: "large", taille: "46", saison: "hiver" }); });
+});

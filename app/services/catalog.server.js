@@ -173,7 +173,7 @@ function sizeMatches(variantSize, wanted) {
 // Familles de couleurs : la cliente peut dire « grenat », « k7el », « marine »… on rapproche
 const COLOR_FAMILIES = [
   ["bordeaux", ["bordeaux", "grenat", "lie de vin", "prune", "cerise", "bourgogne", "rouge fonce", "burgundy", "بوردو", "بوردو"]],
-  ["noir", ["noir", "black", "k7el", "kahla", "khal", "كحل", "كحلة", "اسود", "أسود"]],
+  ["noir", ["noir", "black", "k7el", "k7al", "kahla", "khal", "كحل", "كحلة", "اسود", "أسود"]],
   ["blanc", ["blanc", "ecru", "blanc casse", "white", "byed", "بيض", "بيضاء", "ابيض", "أبيض"]],
   ["beige", ["beige", "camel", "nude", "sable", "creme", "taupe", "بيج"]],
   ["marron", ["marron", "chocolat", "brun", "tabac", "brique", "camel", "قهوي", "قهوة", "شوكولا"]],

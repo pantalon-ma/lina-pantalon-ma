@@ -5,9 +5,34 @@
 import { familyOf } from "./catalog.server";
 import { themeOf } from "./faq.server";
 
-const textOf = (m) =>
+
+// Fautes d'orthographe, darija en lettres latines, mélanges français/darija → mots du catalogue
+const TYPOS = [
+  [/\b(classik|klasik|klassik|clasique|classiq|classic|clasic|klasic)\w*/gi, "classique"],
+  [/\b(kajwal|kajual|cajual|caual|casuel|cazual|kasual|décontracté|decontracte)\b/gi, "casual"],
+  [/\b(spor|sportif|sportive|jogging|survet)\b/gi, "sport"],
+  [/\b(larg|larje|larj|lardj|wase3|wasa3|wasea|wasse3|was3|wassa3|évasé|evase)\b/gi, "large"],
+  [/\b(drwat|drwa|droat|drait|droi|dirikt|direct|dirict|derict|mstagim|mostakim)\b/gi, "droit"],
+  [/\b(etrwa|etroi|etrois|serré|serre|serr[ée]e?|dayek|dayq|d[i9]i[9q]|mzir|mziyer|slime?|cigaret\w*|sigaret\w*)\b/gi, "étroit"],
+  [/\b(noire?s?|k7el|k7al|khal|kahla|k7la|kehla|ka7la)\b/gi, "noir"],
+  [/\b(blanche?s?|byad|bayda|biyad|bid|byed)\b/gi, "blanc"],
+  [/\b(bleue?s?|zr9|zar9a|zer9a|zre9|zar9|zrag|zar9in)\b/gi, "bleu"],
+  [/\b(marro|maron|marrone|kahwi|9ahwi|qahwi|9ahoui|kahoui|chocola)\b/gi, "marron"],
+  [/\b(bordo|bordot|bordeau|bourdeau|bordau|burgundy)\b/gi, "bordeaux"],
+  [/\b(gri|grise?s?|ramadi|rmadi|ramdi)\b/gi, "gris"],
+  [/\b(verte?s?|khdar|khder|khadra|5dar|5edra)\b/gi, "vert"],
+  [/\b(bej|bege|beig|beije)\b/gi, "beige"],
+  [/\b(hiv(?:e|è)r|chta|ach[t]?ta|bard|lbard)\b/gi, "hiver"],
+  [/\b(ete|été|sif|sayf|sh?rgi)\b/gi, "été"],
+  [/\b(pantalan|pantallon|pantalo|pentalon|pontalon|pantalons|serwal|sarwal|srawel|sirwal)\b/gi, "pantalon"],
+  [/\b(tail|tay|tayl|taiye|ma9as|m9as|me9as|mqas|size)\b/gi, "taille"],
+];
+export const fixTypos = (t) => TYPOS.reduce((acc, [re, w]) => acc.replace(re, w), String(t || ""));
+
+const textOf0 = (m) =>
   typeof m.content === "string" ? m.content
     : Array.isArray(m.content) ? m.content.filter((b) => b.type === "text").map((b) => b.text).join(" ") : "";
+const textOf = (m) => (m.role === "user" ? fixTypos(textOf0(m)) : textOf0(m));
 
 export function flowState(messages) {
   const users = messages.filter((m) => m.role === "user").map(textOf).filter((t) => t.trim());
@@ -127,7 +152,8 @@ export function extractParams(messages) {
     else if (/hiver|chaud|شتا|دافي/.test(u)) out.saison = "hiver";
     else if (/été|\bete\b|l[ée]ger|صيف|خفيف/.test(u)) out.saison = "ete";
     else if (/peu importe|كيفما كان/.test(u)) out.saison = "";
-    const n = u.match(/^\s*(?:taille\s*)?(3[4-9]|[45]\d|60)\s*$/) || u.match(/^\s*(?:taille\s*)?(xs|s|m|l|xl|xxl|2xl|3xl|4xl|5xl)\s*$/i);
+    const n = u.match(/^\s*(?:taille\s*)?(3[4-9]|[45]\d|60)\s*$/) || u.match(/^\s*(?:taille\s*)?(xs|s|m|l|xl|xxl|2xl|3xl|4xl|5xl)\s*$/i)
+      || u.match(/(?:taille|t\.?|المقاس|مقاس)\s*:?\s*(3[4-9]|[45]\d|60)\b/) || u.match(/(?:taille|المقاس|مقاس)\s*:?\s*(xs|s|m|l|xl|xxl|2xl|3xl|4xl|5xl)\b/i);
     if (n) out.taille = n[1].toUpperCase();
   }
   return out;
@@ -170,7 +196,8 @@ export function canSearchDirectly(messages) {
   if (!last) return null;
   const mes = extractMeasures(messages);
   const lastHasMeasure = /\d{2,3}/.test(last) && (mes.tour_hanches || mes.tour_taille) && last.length <= 60 && !/[?؟]/.test(last);
-  if (last.length > 22 && !lastHasMeasure) return null;
+  const lastHasSize = /(?:taille|t\.?|المقاس|مقاس)\s*:?\s*(3[4-9]|[45]\d|60|xs|s|m|l|xl|xxl|[2-5]xl)\b/i.test(last) && !/[?؟]/.test(last);
+  if (last.length > 22 && !lastHasMeasure && !lastHasSize) return null;
   const s = flowState(messages);
   if (!(s.style && s.coupe && s.couleur && (s.saisonDite || s.saisonDemandee) && (s.taille || mes.tour_hanches || mes.tour_taille))) return null;
   const p = extractParams(messages);

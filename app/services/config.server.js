@@ -8,7 +8,7 @@ export const AppConfig = {
   api: {
     defaultModel: (process.env.AI_PROVIDER || 'gemini') === 'claude'
       ? (process.env.CLAUDE_MODEL || 'claude-haiku-5-5')
-      : (process.env.GEMINI_MODEL || 'gemini-flash-latest'),
+      : (process.env.GEMINI_MODEL || 'gemini-flash-lite-latest'),
     maxTokens: 2000,
     defaultPromptType: 'pantalonMa',
   },
