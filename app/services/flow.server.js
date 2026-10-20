@@ -134,14 +134,53 @@ export function extractParams(messages) {
 }
 
 /** Recherche directe (sans IA) : la cliente vient de donner la dernière info par un clic / un chiffre */
+/** Tours de hanches / taille (cm) donnés par la cliente, après que Lina les a demandés */
+export function extractMeasures(messages) {
+  const out = {};
+  let askedWaistLast = false;
+  for (const m of messages) {
+    const t = textOf(m);
+    if (m.role === "assistant") { askedWaistLast = /tour de taille en cm\s*\?$|الحزام بالسنتيم؟$/.test(t.trim()) && !/hanches/.test(t); continue; }
+    if (m.role !== "user") continue;
+    const u = t.toLowerCase();
+    const nums = (u.match(/\d{2,3}(?:[.,]\d)?/g) || []).map((x) => Number(x.replace(",", "."))).filter((n) => n >= 55 && n <= 190);
+    if (!nums.length) continue;
+    const hipM = u.match(/(?:hanche|hanches|bassin|وراك|الوراك|fesse)[^\d]{0,20}(\d{2,3})/) || u.match(/(\d{2,3})\s*(?:cm)?\s*(?:de |d')?\s*(?:hanche|hanches|bassin|وراك)/);
+    const waistM = u.match(/(?:taille|ceinture|حزام|الحزام|كرش)[^\d]{0,20}(\d{2,3})/) || u.match(/(\d{2,3})\s*(?:cm)?\s*(?:de |d')?\s*(?:taille|ceinture|حزام)/);
+    if (hipM) out.tour_hanches = Number(hipM[1]);
+    if (waistM) out.tour_taille = Number(waistM[1]);
+    const rest = nums.filter((n) => n !== out.tour_hanches && n !== out.tour_taille);
+    if (!hipM && !waistM) {
+      if (rest.length >= 2) { out.tour_hanches = Math.max(rest[0], rest[1]); out.tour_taille = Math.min(rest[0], rest[1]); }
+      else if (rest.length === 1) {
+        if (askedWaistLast || (out.tour_hanches && !out.tour_taille)) out.tour_taille = rest[0];
+        else if (!out.tour_hanches) out.tour_hanches = rest[0];
+      }
+    } else if (rest.length === 1) {
+      if (hipM && !waistM && !out.tour_taille) out.tour_taille = rest[0];
+      if (waistM && !hipM && !out.tour_hanches) out.tour_hanches = rest[0];
+    }
+  }
+  return out;
+}
+
 export function canSearchDirectly(messages) {
   const users = messages.filter((m) => m.role === "user").map(textOf).filter((t) => t.trim());
   const last = (users[users.length - 1] || "").trim();
-  if (!last || last.length > 22) return null;
+  if (!last) return null;
+  const mes = extractMeasures(messages);
+  const lastHasMeasure = /\d{2,3}/.test(last) && (mes.tour_hanches || mes.tour_taille) && last.length <= 60 && !/[?؟]/.test(last);
+  if (last.length > 22 && !lastHasMeasure) return null;
   const s = flowState(messages);
-  if (!(s.style && s.coupe && s.couleur && (s.saisonDite || s.saisonDemandee) && s.taille)) return null;
-  if (/hanche|الوراك|cm/i.test(users.join(" "))) return null; // mesures : l'IA s'en charge
+  if (!(s.style && s.coupe && s.couleur && (s.saisonDite || s.saisonDemandee) && (s.taille || mes.tour_hanches || mes.tour_taille))) return null;
   const p = extractParams(messages);
-  if (!p.taille || !p.couleur) return null;
+  if (!p.couleur) return null;
+  if (mes.tour_hanches || mes.tour_taille) {
+    delete p.taille;
+    if (mes.tour_hanches) p.tour_hanches = mes.tour_hanches;
+    if (mes.tour_taille) p.tour_taille = mes.tour_taille;
+    return p;
+  }
+  if (!p.taille) return null;
   return p;
 }

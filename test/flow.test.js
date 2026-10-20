@@ -33,3 +33,10 @@ describe("texte libre", () => {
   it("question livraison -> IA", async () => { const { fastReply } = await import("../app/services/flow.server.js"); expect(fastReply([U("Vous livrez à Agadir en combien de jours ?")])).toBe(null); });
   it("recherche directe garde le gris", async () => { const { canSearchDirectly } = await import("../app/services/flow.server.js"); expect(canSearchDirectly([U("Pantalon gris classique"),A("Quelle coupe ?"),U("Large"),A("Pour quelle saison ?"),U("Hiver"),A("Votre taille ?"),U("40")]).couleur).toBe("gris"); });
 });
+describe("mesures sans IA", () => {
+  const base=[U("Classique"),A("x"),U("Large"),A("x"),U("Noir"),A("Pour quelle saison ?"),U("Hiver"),A("Votre taille ?"),U("Je ne connais pas ma taille"),A("Votre tour de hanches et votre tour de taille en cm ?")];
+  it("deux nombres", async () => { const { canSearchDirectly: c } = await import("../app/services/flow.server.js"); expect(c([...base,U("119 100")])).toMatchObject({tour_hanches:119,tour_taille:100}); });
+  it("avec mots", async () => { const { canSearchDirectly: c } = await import("../app/services/flow.server.js"); expect(c([...base,U("hanches 123 et taille 104")])).toMatchObject({tour_hanches:123,tour_taille:104}); });
+  it("hanches puis taille", async () => { const { canSearchDirectly: c } = await import("../app/services/flow.server.js"); expect(c([...base,U("Tour hanche 123"),A("Et votre tour de taille en cm ?"),U("104")])).toMatchObject({tour_hanches:123,tour_taille:104}); });
+  it("une seule -> recherche (l'outil demandera l'autre)", async () => { const { canSearchDirectly: c } = await import("../app/services/flow.server.js"); const r=c([...base,U("Tour hanche 123")]); expect(r.tour_hanches).toBe(123); expect(r.tour_taille).toBeUndefined(); });
+});
