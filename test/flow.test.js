@@ -17,7 +17,7 @@ describe("réponse rapide", () => {
   it("Noir -> saison", () => expect(fastReply([U("Classique"),U("Large"),U("Noir")])).toMatch(/saison/));
   it("Hiver -> taille", () => expect(fastReply([U("Classique"),U("Large"),U("Noir"),A("Pour quelle saison ?"),U("Hiver")])).toBe("Votre taille ?"));
   it("44 -> IA", () => expect(fastReply([U("Classique"),U("Large"),U("Noir"),U("Hiver"),U("44")])).toBe(null));
-  it("phrase libre pantalon -> question type", () => expect(fastReply([U("je veux un pantalon pour le bureau")])).toMatch(/classique, casual ou sport/));
+  it("phrase libre pantalon -> question suivante (bureau = classique)", () => expect(fastReply([U("je veux un pantalon pour le bureau")])).toMatch(/coupe/));
   it("darija", () => expect(fastReply([U("كلاسيك")],"darija")).toMatch(/قصة/));
 });
 describe("rapide autres", () => { it("autres couleurs", () => expect(fastReply([U("Noir"),A("x"),U("Autres couleurs")])).toBe("Quelle couleur ?")); });
@@ -43,4 +43,7 @@ describe("mesures sans IA", () => {
 describe("fautes et darija latine", () => {
   it("bghit serwal k7el wase3 classik -> saison (sans IA)", async () => { const { fastReply } = await import("../app/services/flow.server.js"); expect(fastReply([U("salam bghit serwal k7el wase3 classik")])).toMatch(/saison/); });
   it("phrase complète avec taille -> recherche directe", async () => { const { canSearchDirectly } = await import("../app/services/flow.server.js"); expect(canSearchDirectly([U("je veux un pantalan noire larg classik pour l'hiver taille 46")])).toMatchObject({ style: "classique", type: "large", taille: "46", saison: "hiver" }); });
+});
+describe("phrases courtes libres", () => {
+  it("droit classe 44 -> couleur (sans IA)", async () => { const { fastReply } = await import("../app/services/flow.server.js"); expect(fastReply([U("droit classe 44")])).toBe("Quelle couleur ?"); });
 });

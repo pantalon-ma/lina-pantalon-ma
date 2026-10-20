@@ -8,7 +8,7 @@ import { themeOf } from "./faq.server";
 
 // Fautes d'orthographe, darija en lettres latines, mélanges français/darija → mots du catalogue
 const TYPOS = [
-  [/\b(classik|klasik|klassik|clasique|classiq|classic|clasic|klasic)\w*/gi, "classique"],
+  [/\b(classik|klasik|klassik|clasique|classiq|classic|clasic|klasic|classe|class|classy|chic|habill[ée]e?|bureau|travail)\w*/gi, "classique"],
   [/\b(kajwal|kajual|cajual|caual|casuel|cazual|kasual|décontracté|decontracte)\b/gi, "casual"],
   [/\b(spor|sportif|sportive|jogging|survet)\b/gi, "sport"],
   [/\b(larg|larje|larj|lardj|wase3|wasa3|wasea|wasse3|was3|wassa3|évasé|evase)\b/gi, "large"],
@@ -102,8 +102,15 @@ export function fastReply(messages, langue) {
       ? "الفريق ديالنا كيجاوبك على واتساب 😊\n[كتبي لينا على واتساب](https://wa.me/212703200695)"
       : "Notre équipe vous répond sur WhatsApp 😊\n[Écrire sur WhatsApp](https://wa.me/212703200695)";
   if (/^(je ne connais pas ma taille|ما عارفاش المقاس)$/i.test(last)) return (langue === "darija" ? Q.ar : Q.fr).mesures;
+  {
+    const st0 = flowState(messages);
+    const q0 = langue === "darija" ? Q.ar : Q.fr;
+    if (st0.autreCouleur) return q0.couleur;
+    if (st0.autreCoupe) return q0.coupe;
+  }
   // Demande en texte libre d'un pantalon (« pantalon gris classique », « bghit serwal… ») : question suivante sans IA
-  if (last && last.length > 22) {
+  const estBouton = SIMPLE.test(last) || (familyOf(last) && last.split(/\s+/).length <= 3) || /^(3[4-9]|[45]\d|60)$/.test(last.trim());
+  if (last && !estBouton && last.length <= 120) {
     const lw = last.toLowerCase();
     const parlePantalon = /pantalon|serwal|sarwal|سروال|سراول|jean|palazzo|jupe|classi|casual|sport|large|droit|[ée]troit|chaud|كلاسيك|كاجوال|واسع|ضيق/.test(lw) || !!familyOf(last);
     const th = themeOf(last);
@@ -153,7 +160,8 @@ export function extractParams(messages) {
     else if (/été|\bete\b|l[ée]ger|صيف|خفيف/.test(u)) out.saison = "ete";
     else if (/peu importe|كيفما كان/.test(u)) out.saison = "";
     const n = u.match(/^\s*(?:taille\s*)?(3[4-9]|[45]\d|60)\s*$/) || u.match(/^\s*(?:taille\s*)?(xs|s|m|l|xl|xxl|2xl|3xl|4xl|5xl)\s*$/i)
-      || u.match(/(?:taille|t\.?|المقاس|مقاس)\s*:?\s*(3[4-9]|[45]\d|60)\b/) || u.match(/(?:taille|المقاس|مقاس)\s*:?\s*(xs|s|m|l|xl|xxl|2xl|3xl|4xl|5xl)\b/i);
+      || u.match(/(?:taille|t\.?|المقاس|مقاس)\s*:?\s*(3[4-9]|[45]\d|60)\b/)
+      || (/pantalon|classique|casual|sport|large|droit|étroit|noir|blanc|bleu|gris|marron|vert|beige|bordeaux/.test(u) ? u.match(/(?:^|\s)(3[4-9]|[45]\d|60)(?:\s|$)/) : null) || u.match(/(?:taille|المقاس|مقاس)\s*:?\s*(xs|s|m|l|xl|xxl|2xl|3xl|4xl|5xl)\b/i);
     if (n) out.taille = n[1].toUpperCase();
   }
   return out;
@@ -196,7 +204,7 @@ export function canSearchDirectly(messages) {
   if (!last) return null;
   const mes = extractMeasures(messages);
   const lastHasMeasure = /\d{2,3}/.test(last) && (mes.tour_hanches || mes.tour_taille) && last.length <= 60 && !/[?؟]/.test(last);
-  const lastHasSize = /(?:taille|t\.?|المقاس|مقاس)\s*:?\s*(3[4-9]|[45]\d|60|xs|s|m|l|xl|xxl|[2-5]xl)\b/i.test(last) && !/[?؟]/.test(last);
+  const lastHasSize = (/(?:taille|t\.?|المقاس|مقاس)\s*:?\s*(3[4-9]|[45]\d|60|xs|s|m|l|xl|xxl|[2-5]xl)\b/i.test(last) || /(?:^|\s)(3[4-9]|[45]\d|60)(?:\s|$)/.test(last)) && !/[?؟]/.test(last);
   if (last.length > 22 && !lastHasMeasure && !lastHasSize) return null;
   const s = flowState(messages);
   if (!(s.style && s.coupe && s.couleur && (s.saisonDite || s.saisonDemandee) && (s.taille || mes.tour_hanches || mes.tour_taille))) return null;
