@@ -8,7 +8,7 @@ const FR = {
   couleur: ["Noir", "Beige", "Bleu", "Gris", "Marron", "Bordeaux", "Vert", "Autre couleur"],
   taille: ["38", "40", "42", "44", "46", "48", "50", "52", "54", "56", "Je ne connais pas ma taille"],
   saison: ["Hiver", "Demi-saison", "Été", "Peu importe"],
-  couleur2: ["Blanc", "Camel", "Rose", "Rouge", "Violet", "Léopard"],
+  couleur2: ["Noir", "Bleu", "Marron", "Gris", "Beige", "Vert", "Bordeaux", "Blanc", "Camel", "Rose", "Rouge", "Violet", "Léopard"],
   apres: ["Autres couleurs", "Autre coupe", "Parler à une conseillère"],
 };
 const AR = {
@@ -17,7 +17,7 @@ const AR = {
   couleur: ["كحل", "بيج", "زرق", "رمادي", "قهوي", "بوردو", "خضر", "لون آخر"],
   taille: ["38", "40", "42", "44", "46", "48", "50", "52", "54", "56", "ما عارفاش المقاس"],
   saison: ["الشتا", "نص الموسم", "الصيف", "كيفما كان"],
-  couleur2: ["بيض", "كاميل", "وردي", "حمر", "موف", "نمر"],
+  couleur2: ["كحل", "زرق", "قهوي", "رمادي", "بيج", "خضر", "بوردو", "بيض", "كاميل", "وردي", "حمر", "موف", "نمر"],
   apres: ["ألوان أخرى", "قصة أخرى", "نهضر مع مستشارة"],
 };
 
