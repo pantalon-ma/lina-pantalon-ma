@@ -13,3 +13,13 @@ describe("browse", () => {
     console.log(p, canSearchDirectly([{ role: "user", content: "وريني السراول الواسعين الكحلين" }]));
   });
 });
+describe("sans taille", () => {
+  it("classique gris sans taille", () => {
+    for (const m of ["classique gris sans taille", "Classique gris bla taille", "affiche tout les modeles gris classique", "كلاسيك رمادي بلا مقاس"]) {
+      const p = canSearchDirectly([{ role: "user", content: m }]);
+      expect(p?.parcourir, m).toBe(true);
+      expect(p.couleur, m).toBe("gris");
+      expect(p.style, m).toBe("classique");
+    }
+  });
+});

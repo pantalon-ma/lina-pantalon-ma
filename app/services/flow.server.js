@@ -26,9 +26,13 @@ const TYPOS = [
   [/\b(ete|été|sif|sayf|sh?rgi)\b/gi, "été"],
   [/\b(falda|faldas|saya|sayat|sayate|jup|jupes)\b|صاية|صايات|فالدا|جيب/gi, "jupe"],
   [/\b(pantalan|pantallon|pantalo|pentalon|pontalon|pantalons|serwal|sarwal|srawel|sirwal)\b/gi, "pantalon"],
+  [/كلاسيكي?|كلاسيك/g, "classique"], [/كاجوال/g, "casual"], [/سبور/g, "sport"],
+  [/الواسعين|واسعة?|الواسع/g, "large"], [/ديريكت|مستقيم/g, "droit"], [/ضيقة?|الضيق/g, "étroit"],
+  [/كحلة?|الكحل|كحلين|كحال/g, "noir"], [/رمادي|رمادية|ڭري|گري/g, "gris"], [/زرقة?|زرقاء|الزرق/g, "bleu"],
+  [/قهوي|قهوية|ماروني|مارون/g, "marron"], [/بيج/g, "beige"], [/خضرة?|خضراء|الخضر/g, "vert"], [/بيضة?|بيضاء|بيض/g, "blanc"], [/بوردو/g, "bordeaux"],
   [/\b(tail|tay|tayl|taiye|ma9as|m9as|me9as|mqas|size)\b/gi, "taille"],
 ];
-export const VEUT_VOIR = /voir (les |des )?(mod[eè]les|pantalons|photos)|montre[zr]?[- ]moi|montrez|d['’]abord|avant (de|la) taille|نشوف الموديلات|وريني|بغيت نشوف|nchouf|wrini/i;
+export const VEUT_VOIR = /sans (la |ma )?taille|bla (taille|ma9as|l?mi9as)|بلا (مقاس|المقاس|قياس)|bla taille|tou[st]e?s? les mod[eè]les|affiche[rz]?|voir (les |des )?(mod[eè]les|pantalons|photos)|montre[zr]?[- ]moi|montrez|d['’]abord|avant (de|la) taille|نشوف الموديلات|وريني|بغيت نشوف|nchouf|wrini/i;
 export const fixTypos = (t) => TYPOS.reduce((acc, [re, w]) => acc.replace(re, w), String(t || ""));
 
 const textOf0 = (m) =>

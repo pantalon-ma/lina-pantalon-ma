@@ -299,7 +299,7 @@ export async function searchCatalog(shopOrigin, args = {}) {
   const parMesures = !taille && (mesures.tour_hanches || mesures.tour_taille);
   // taille voulue pour CE modèle : celle de la cliente, ou celle calculée avec le guide du modèle
   const sizeFor = (p) => taille || (parMesures ? recommendSize(p.title, mesures) : "");
-  const max = Math.min(Math.max(Number(args.max) || (args.parcourir ? 6 : 4), 1), 8);
+  const max = Math.min(Math.max(Number(args.max) || (args.parcourir ? 8 : 4), 1), 8);
   const style = normStyle(args.style);
   const sa = String(args.saison || "");
   const saisonVoulue = veutChaud ? "hiver" : veutLeger ? "ete" : /demi|mi.saison|intersaison|نص/i.test(sa) ? "demi" : /ete|été|printemps|صيف/i.test(sa) ? "ete" : /hiver|automne|شتا/i.test(sa) ? "hiver" : currentSeason();
