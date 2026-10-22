@@ -6,7 +6,7 @@ const FR = {
   type: ["Classique", "Casual / Sport"],
   coupe: ["Large", "Droite", "Étroite"],
   couleur: ["Noir", "Beige", "Bleu", "Gris", "Marron", "Bordeaux", "Vert", "Autre couleur"],
-  taille: ["38", "40", "42", "44", "46", "48", "50", "52", "54", "56", "Je ne connais pas ma taille"],
+  taille: ["38", "40", "42", "44", "46", "48", "50", "52", "54", "56", "Je ne connais pas ma taille", "Voir les modèles d'abord"],
   saison: ["Hiver", "Demi-saison", "Été", "Peu importe"],
   couleur2: ["Noir", "Bleu", "Marron", "Gris", "Beige", "Vert", "Bordeaux", "Blanc", "Camel", "Rose", "Rouge", "Violet", "Léopard"],
   apres: ["Autres couleurs", "Autre coupe", "Parler à une conseillère"],
@@ -15,7 +15,7 @@ const AR = {
   type: ["كلاسيك", "كاجوال / سبور"],
   coupe: ["واسع", "ديريكت", "ضيق"],
   couleur: ["كحل", "بيج", "زرق", "رمادي", "قهوي", "بوردو", "خضر", "لون آخر"],
-  taille: ["38", "40", "42", "44", "46", "48", "50", "52", "54", "56", "ما عارفاش المقاس"],
+  taille: ["38", "40", "42", "44", "46", "48", "50", "52", "54", "56", "ما عارفاش المقاس", "نشوف الموديلات أولا"],
   saison: ["الشتا", "نص الموسم", "الصيف", "كيفما كان"],
   couleur2: ["كحل", "زرق", "قهوي", "رمادي", "بيج", "خضر", "بوردو", "بيض", "كاميل", "وردي", "حمر", "موف", "نمر"],
   apres: ["ألوان أخرى", "قصة أخرى", "نهضر مع مستشارة"],
@@ -27,6 +27,7 @@ export function quickRepliesFor(text, { langue, produitsAffiches, dernierMessage
   const L = langue === "darija" ? AR : FR;
   const t = String(text || "").toLowerCase();
   const question = /[?؟]\s*(😊|🙂)?\s*$/.test(t.trim()) || /[?؟]/.test(t.slice(-80));
+  if (produitsAffiches && /vérifier la disponibilit|باش نأكد ليك/.test(t)) return L.taille.slice(0, -1); // mode « voir d'abord » : on demande la taille
   if (produitsAffiches) return L.apres;
   if (!question) return [];
   if (/tour de hanche|tour de taille en cm|الوراك|الدورة/.test(t)) return []; // mesures : saisie libre

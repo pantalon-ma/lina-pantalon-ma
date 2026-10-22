@@ -69,6 +69,7 @@ export const catalogTool = {
       taille: { type: "string", description: "Taille souhaitée, ex. '44' ou 'XL'. Vide si inconnue." },
       style: { type: "string", description: "Type de pantalon : 'classique', 'casual' ou 'sport' (sport = milano, molleton, molleton gratté). Vide si indifférent." },
       saison: { type: "string", description: "'hiver', 'ete' ou 'demi-saison' seulement si la cliente demande des modèles pour une saison précise ; sinon vide (saison actuelle par défaut)." },
+      parcourir: { type: "boolean", description: "true si la cliente veut d'abord VOIR les modèles avant de donner sa taille : montre les modèles en stock (toutes tailles)." },
       tour_hanches: { type: "number", description: "Tour de hanches COMPLET de la cliente en cm (mesuré sur le corps), si elle l'a donné. L'outil calcule la taille de chaque modèle." },
       tour_taille: { type: "number", description: "Tour de taille COMPLET de la cliente en cm, si elle l'a donné." },
       max: { type: "number", description: "Nombre maximum de modèles à renvoyer (défaut 4)." },
@@ -298,7 +299,7 @@ export async function searchCatalog(shopOrigin, args = {}) {
   const parMesures = !taille && (mesures.tour_hanches || mesures.tour_taille);
   // taille voulue pour CE modèle : celle de la cliente, ou celle calculée avec le guide du modèle
   const sizeFor = (p) => taille || (parMesures ? recommendSize(p.title, mesures) : "");
-  const max = Math.min(Math.max(Number(args.max) || 4, 1), 8);
+  const max = Math.min(Math.max(Number(args.max) || (args.parcourir ? 6 : 4), 1), 8);
   const style = normStyle(args.style);
   const sa = String(args.saison || "");
   const saisonVoulue = veutChaud ? "hiver" : veutLeger ? "ete" : /demi|mi.saison|intersaison|نص/i.test(sa) ? "demi" : /ete|été|printemps|صيف/i.test(sa) ? "ete" : /hiver|automne|شتا/i.test(sa) ? "hiver" : currentSeason();
@@ -315,7 +316,10 @@ export async function searchCatalog(shopOrigin, args = {}) {
     if (sameStyle.length) all = sameStyle;
   }
 
-  const fits = (p, useColor, useSize) => {
+  // Mode « voir les modèles d'abord » : on montre les modèles en stock sans filtrer la taille
+  const parcourir = !!args.parcourir && !taille && !parMesures;
+  const fits = (p, useColor, useSize0) => {
+    const useSize = useSize0 && !parcourir;
     const t = useSize ? sizeFor(p) : "";
     if (useSize && !t) return false;
     return p.variants.nodes.some(
@@ -350,7 +354,7 @@ export async function searchCatalog(shopOrigin, args = {}) {
   }
 
   // 0) sans taille : on ne propose rien, Lina demande d'abord la taille
-  if (!taille && !parMesures) {
+  if (!taille && !parMesures && !parcourir) {
     return { demande: { couleur, type, taille }, besoin_taille: true, similaires: false, rupture: false,
       note: "Taille inconnue : demande d'abord la taille de la cliente avant de proposer des modèles.", products: [] };
   }
@@ -398,6 +402,7 @@ export async function searchCatalog(shopOrigin, args = {}) {
     ...(parMesures ? { taille_conseillee: sizeFor(p) } : {}),
   }));
   return {
+    ...(parcourir ? { parcourir: true } : {}),
     demande: { couleur, type, taille },
     saison,
     similaires,

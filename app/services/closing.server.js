@@ -47,6 +47,10 @@ export function closingText(result, { langue, promoDeja } = {}) {
     const txt = head + prop + ask;
     return promoDeja || !n ? txt : `${txt}\n\n${ar ? PROMO_AR : PROMO_FR}`;
   }
+  if (result.parcourir && result.products?.length) {
+    const line = ar ? "هادو الموديلات المتوفرة 😊 شنو المقاس ديالك باش نأكد ليك؟" : "Voici les modèles disponibles 😊 Votre taille, pour vérifier la disponibilité ?";
+    return promoDeja ? line : `${line}\n\n${ar ? PROMO_AR : PROMO_FR}`;
+  }
   if (result.products?.length) {
     const mesures = result.products.some((p) => p.taille_conseillee);
     const line = ar

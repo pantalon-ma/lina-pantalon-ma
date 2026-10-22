@@ -28,6 +28,7 @@ const TYPOS = [
   [/\b(pantalan|pantallon|pantalo|pentalon|pontalon|pantalons|serwal|sarwal|srawel|sirwal)\b/gi, "pantalon"],
   [/\b(tail|tay|tayl|taiye|ma9as|m9as|me9as|mqas|size)\b/gi, "taille"],
 ];
+export const VEUT_VOIR = /voir (les |des )?(mod[eè]les|pantalons|photos)|montre[zr]?[- ]moi|montrez|d['’]abord|avant (de|la) taille|نشوف الموديلات|وريني|بغيت نشوف|nchouf|wrini/i;
 export const fixTypos = (t) => TYPOS.reduce((acc, [re, w]) => acc.replace(re, w), String(t || ""));
 
 const textOf0 = (m) =>
@@ -110,6 +111,7 @@ export function fastReply(messages, langue) {
     if (st0.autreCouleur) return q0.couleur;
     if (st0.autreCoupe) return q0.coupe;
   }
+  if (VEUT_VOIR.test(last)) return null; // la cliente veut voir les modèles d'abord : recherche directe sans taille
   // Demande en texte libre d'un pantalon (« pantalon gris classique », « bghit serwal… ») : question suivante sans IA
   const estBouton = SIMPLE.test(last) || (familyOf(last) && last.split(/\s+/).length <= 3) || /^(3[4-9]|[45]\d|60)$/.test(last.trim());
   if (last && !estBouton && last.length <= 120) {
@@ -205,6 +207,12 @@ export function canSearchDirectly(messages) {
   const users = messages.filter((m) => m.role === "user").map(textOf).filter((t) => t.trim());
   const last = (users[users.length - 1] || "").trim();
   if (!last) return null;
+  // « Voir les modèles d'abord » : on montre ce qui correspond à ce qu'elle a dit, toutes tailles
+  if (VEUT_VOIR.test(last) && !/[?؟]\s*$/.test(last.replace(/voir les mod[eè]les d'abord/i, ""))) {
+    const pv = extractParams(messages);
+    delete pv.taille;
+    return { ...pv, parcourir: true };
+  }
   const mes = extractMeasures(messages);
   const lastHasMeasure = /\d{2,3}/.test(last) && (mes.tour_hanches || mes.tour_taille) && last.length <= 60 && !/[?؟]/.test(last);
   const lastHasSize = (/(?:taille|t\.?|المقاس|مقاس)\s*:?\s*(3[4-9]|[45]\d|60|xs|s|m|l|xl|xxl|[2-5]xl)\b/i.test(last) || /(?:^|\s)(3[4-9]|[45]\d|60)(?:\s|$)/.test(last)) && !/[?؟]/.test(last);

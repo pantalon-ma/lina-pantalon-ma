@@ -52,3 +52,20 @@ describe("jupes", () => {
   it("falda + 42 -> recherche jupe", async () => { const { canSearchDirectly } = await import("../app/services/flow.server.js"); expect(canSearchDirectly([U("je cherche une falda"),A("Votre taille ?"),U("42")])).toMatchObject({ type: "jupe", taille: "42" }); });
   it("pantalon jupe reste un pantalon", async () => { const { flowState } = await import("../app/services/flow.server.js"); expect(flowState([U("pantalon jupe noir")]).jupe).toBe(false); });
 });
+
+describe("mode voir les modèles d'abord", () => {
+  it("cherche sans taille quand la cliente veut voir", async () => {
+    const { canSearchDirectly, fastReply } = await import("../app/services/flow.server.js");
+    const msgs = [
+      { role: "user", content: "Classique" }, { role: "assistant", content: "Quelle coupe : large, droite ou étroite ?" },
+      { role: "user", content: "Large" }, { role: "assistant", content: "Quelle couleur ?" },
+      { role: "user", content: "Noir" }, { role: "assistant", content: "Pour quelle saison : hiver, demi-saison ou été ?" },
+      { role: "user", content: "Hiver" }, { role: "assistant", content: "Votre taille ?" },
+      { role: "user", content: "Voir les modèles d'abord" },
+    ];
+    expect(fastReply(msgs, "fr")).toBeNull();
+    const p = canSearchDirectly(msgs);
+    expect(p.parcourir).toBe(true);
+    expect(p.taille).toBeUndefined();
+  });
+});
