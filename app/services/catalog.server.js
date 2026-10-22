@@ -35,7 +35,7 @@ async function getStorefrontToken(shopDomain) {
 // Grands types : classique / casual / sport
 const STYLE_WORDS = {
   sport: ["milano", "molleton"],
-  classique: ["classique", "tailleur", "gabardine", "twill"],
+  classique: ["john smith", "classique", "tailleur", "gabardine", "twill"],
   casual: ["casual", "palazzo", "pantalon jupe", "jean", "lin", "viscose", "crepe", "velours", "simili", "sky", "john smith", "rayonne", "tencel"],
 };
 export function styleOf(product) {
@@ -256,7 +256,7 @@ const TYPE_SYNONYMS = {
   droit: ["droit"], straight: ["droit"],
   jupe: ["jupe"],
   casual: ["casual"], decontracte: ["casual"],
-  classique: ["classique"], habille: ["classique"], chic: ["classique"],
+  classique: ["john smith", "classique"], habille: ["classique"], chic: ["classique"],
 };
 export function keywordScore(product, type) {
   const words = norm(type).split(" ").filter((x) => x.length > 1 && !STOP.has(x));
@@ -299,7 +299,7 @@ export async function searchCatalog(shopOrigin, args = {}) {
   const parMesures = !taille && (mesures.tour_hanches || mesures.tour_taille);
   // taille voulue pour CE modèle : celle de la cliente, ou celle calculée avec le guide du modèle
   const sizeFor = (p) => taille || (parMesures ? recommendSize(p.title, mesures) : "");
-  const max = Math.min(Math.max(Number(args.max) || (args.parcourir ? 8 : 4), 1), 8);
+  const max = args.parcourir && !taille && !parMesures ? 40 : Math.min(Math.max(Number(args.max) || 4, 1), 8);
   const style = normStyle(args.style);
   const sa = String(args.saison || "");
   const saisonVoulue = veutChaud ? "hiver" : veutLeger ? "ete" : /demi|mi.saison|intersaison|نص/i.test(sa) ? "demi" : /ete|été|printemps|صيف/i.test(sa) ? "ete" : /hiver|automne|شتا/i.test(sa) ? "hiver" : currentSeason();

@@ -247,7 +247,7 @@ async function handleChatSession({
         const text = closingText(result, { langue, promoDeja: promoDejaAffichee(fullHistory) });
         if (text) {
           if (result.products?.length) {
-            stream.sendMessage({ type: 'product_results', products: result.products.slice(0, AppConfig.tools.maxProductsToDisplay) });
+            stream.sendMessage({ type: 'product_results', products: result.products.slice(0, result.parcourir ? 40 : AppConfig.tools.maxProductsToDisplay) });
             stream.sendMessage({ type: 'new_message' });
           }
           stream.sendMessage({ type: 'chunk', chunk: text });

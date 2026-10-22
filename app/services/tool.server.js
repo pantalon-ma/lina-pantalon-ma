@@ -46,7 +46,7 @@ export function createToolService() {
         const data = JSON.parse(toolUseResponse.content[0].text);
         // On remplace les cartes précédentes par la dernière recherche
         productsToDisplay.length = 0;
-        productsToDisplay.push(...(data.products || []).slice(0, AppConfig.tools.maxProductsToDisplay));
+        productsToDisplay.push(...(data.products || []).slice(0, data.parcourir ? 40 : AppConfig.tools.maxProductsToDisplay));
       } catch (e) { console.error("Erreur lecture catalogue:", e); }
     } else if (toolName === AppConfig.tools.productSearchName) {
       productsToDisplay.push(...processProductSearchResult(toolUseResponse));
