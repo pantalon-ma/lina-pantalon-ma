@@ -1,0 +1,6 @@
+# Autorise la lecture du rapport hebdomadaire de Lina (protégé par une clé privée).
+# Le reste de l'application n'a pas à être exploré.
+User-agent: *
+Allow: /lina-report
+Allow: /healthz
+Disallow: /

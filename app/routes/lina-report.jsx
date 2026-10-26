@@ -29,5 +29,5 @@ export async function loader({ request }) {
     questions_par_theme: faq.themes, autres_questions: faq.autres,
     questions_sans_reponse: sansReponse,
     ruptures_demandees: Object.entries(ruptures).sort((a, b) => b[1] - a[1]).slice(0, 10),
-  });
+  }, { headers: { "X-Robots-Tag": "noindex, nofollow" } });
 }
