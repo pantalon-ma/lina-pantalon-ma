@@ -996,6 +996,9 @@
 
       this.UI.init(container);
 
+      // Réveille le serveur de Lina dès l'arrivée sur le site (avant le 1er message)
+      try { fetch('https://lina-pantalon-ma.onrender.com/healthz', { mode: 'no-cors', cache: 'no-store' }).catch(function() {}); } catch (e) {}
+
       // Check for existing conversation
       const conversationId = sessionStorage.getItem('shopAiConversationId');
 

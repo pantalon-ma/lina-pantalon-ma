@@ -128,12 +128,30 @@ const QUERY = `query Catalogue($cursor: String) {
   }
 }`;
 
+// Catalogue gardé en mémoire : si le cache est un peu ancien, on répond tout de suite avec lui
+// et on le rafraîchit en arrière-plan (la cliente n'attend jamais le rechargement du stock).
+const inflight = new Map();
 async function loadCatalog(shopOrigin) {
-  const hit = cache.get(shopOrigin);
-  if (hit && Date.now() - hit.at < CACHE_MS) return hit.products;
-
-  // Domaine .myshopify.com (session de l'app) — l'origine peut être pantalon.ma
   const shopDomain = shopDomainFor(new URL(shopOrigin).hostname);
+  const hit = cache.get(shopDomain);
+  if (hit && Date.now() - hit.at < CACHE_MS) return hit.products;
+  if (hit && Date.now() - hit.at < 30 * 60 * 1000) {
+    refreshCatalog(shopDomain).catch((e) => console.error("[Lina] rafraîchissement catalogue:", e.message));
+    return hit.products;
+  }
+  return refreshCatalog(shopDomain);
+}
+function refreshCatalog(shopDomain) {
+  if (!inflight.has(shopDomain)) {
+    inflight.set(shopDomain, fetchCatalog(shopDomain).finally(() => inflight.delete(shopDomain)));
+  }
+  return inflight.get(shopDomain);
+}
+/** Préchauffe le catalogue (appelé au démarrage et par /healthz) */
+export function warmCatalog(origin = process.env.LINA_SHOP_ORIGIN || "https://pantalon.ma") {
+  return loadCatalog(origin).catch((e) => console.error("[Lina] préchauffage catalogue:", e.message));
+}
+async function fetchCatalog(shopDomain) {
   const token = await getStorefrontToken(shopDomain);
 
   const products = [];
@@ -155,7 +173,7 @@ async function loadCatalog(shopOrigin) {
     if (!conn.pageInfo.hasNextPage) break;
     cursor = conn.pageInfo.endCursor;
   }
-  cache.set(shopOrigin, { at: Date.now(), products });
+  cache.set(shopDomain, { at: Date.now(), products });
   return products;
 }
 
