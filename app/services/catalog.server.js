@@ -295,7 +295,7 @@ function shape(product, shopOrigin, couleur, taille) {
     title: product.title,
     price: exact ? `${Math.round(Number(exact.price.amount))} DH` : "",
     image_url: exact?.image?.url || product.featuredImage?.url || "",
-    url: `${shopOrigin}/products/${product.handle}${variantId ? `?variant=${variantId}` : ""}`,
+    url: `${shopOrigin}/products/${product.handle}?${variantId ? `variant=${variantId}&` : ""}utm_source=lina&utm_medium=chat`,
     couleur_proposee: exact ? colorOf(exact) : "",
     colors,
     taille_proposee: exact && taille ? sizeOf(exact) : "",
@@ -428,4 +428,23 @@ export async function searchCatalog(shopOrigin, args = {}) {
     note: "Modèles en stock dans sa taille correspondant à la demande.",
     products,
   };
+}
+
+
+/**
+ * Pour le rapport : pourquoi une demande n'a pas été trouvée ?
+ *  - "jamais"  : aucun modèle de ce type dans cette couleur au catalogue (même épuisé) → modèle que nous n'avons pas
+ *  - "taille"  : le modèle/couleur existe mais jamais dans cette taille
+ *  - "rupture" : le modèle/couleur/taille existe mais est épuisé
+ */
+export async function diagnoseDemand(shopOrigin, { type = "", couleur = "", taille = "" }) {
+  const all = await loadCatalog(shopOrigin);
+  const t = String(type || "").replace(/[ée]troit\w*/i, "à fentes");
+  const veutJupe = /\bjupe\b/i.test(t) && !/pantalon\s+jupe/i.test(t);
+  const list = all.filter((p) => (veutJupe ? /^jupe\b/ : /^(?!jupe\b)/).test(cleanTitle(p.title)) && (!t || keywordScore(p, t) > 0));
+  const vs = list.flatMap((p) => p.variants.nodes).filter((v) => !couleur || colorMatches(colorOf(v), couleur));
+  if (!vs.length) return "jamais";
+  const vt = vs.filter((v) => !taille || sizeMatches(sizeOf(v), taille));
+  if (!vt.length) return "taille";
+  return vt.some((v) => v.availableForSale) ? "dispo" : "rupture";
 }

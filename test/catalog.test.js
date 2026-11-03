@@ -10,7 +10,7 @@ const prods=[
 ];
 global.fetch=vi.fn(async()=>({status:200,text:async()=>JSON.stringify({data:{products:{pageInfo:{hasNextPage:false},nodes:prods}}}),json:async()=>({})}));
 describe("catalogue",()=>{
- it("exact en stock",async()=>{const r=await searchCatalog("https://x.ma",{couleur:"noir",type:"large",taille:"42"});expect(r.similaires).toBe(false);expect(r.products[0].url).toBe("https://x.ma/products/large-prada?variant=2");});
+ it("exact en stock",async()=>{const r=await searchCatalog("https://x.ma",{couleur:"noir",type:"large",taille:"42"});expect(r.similaires).toBe(false);expect(r.products[0].url).toBe("https://x.ma/products/large-prada?variant=2&utm_source=lina&utm_medium=chat");});
  it("rupture -> modèles proches dans sa taille + choix",async()=>{const r=await searchCatalog("https://y.ma",{couleur:"noir",type:"large",taille:"XL"});expect(r.rupture).toBe(true);expect(r.products.length).toBeGreaterThan(0);expect(r.products.every(p=>/XL|44/.test(p.taille_proposee))).toBe(true);});
  it("sans taille -> demander la taille",async()=>{const r=await searchCatalog("https://v.ma",{couleur:"noir",type:"large"});expect(r.besoin_taille).toBe(true);expect(r.products.length).toBe(0);});
  it("palazzo en rupture jamais proposé",async()=>{const r=await searchCatalog("https://z.ma",{type:"palazzo",taille:"42"});expect(r.products.map(p=>p.title).join()).not.toContain("Palazzo");});
@@ -54,3 +54,10 @@ describe("pantalon chaud", () => {
   });
 });
 describe("jupes", () => { it("« large » ne matche pas « Jupe Evasée »", async () => { const { keywordScore: k } = await import("../app/services/catalog.server.js"); expect(k({ title: "Pantalon Femme - Jupe Evasée à Ceinture", productType: "", tags: [] }, "large")).toBe(0); }); });
+describe("diagnostic des demandes", () => {
+  it("absent / taille / rupture", async () => {
+    const { diagnoseDemand } = await import("../app/services/catalog.server.js");
+    expect(await diagnoseDemand("https://x.ma", { type: "large", couleur: "violet", taille: "" })).toBe("jamais");
+    expect(await diagnoseDemand("https://x.ma", { type: "large", couleur: "noir", taille: "70" })).toBe("taille");
+  });
+});
