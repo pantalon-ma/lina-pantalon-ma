@@ -353,7 +353,9 @@ export async function searchCatalog(shopOrigin, args = {}) {
     list.map((p) => ({ p, z: seasonScore(p, saisonVoulue) })).sort((a, b) => b.z - a.z).map((x) => x.p);
   // Sport / casual : large et droit sont des coupes proches → l'autre coupe vient juste après
   const tNorm = norm(type);
-  const procheType = (style === "sport" || style === "casual") ? (/\blarge\b/.test(tNorm) ? "droit" : /\bdroit/.test(tNorm) ? "large" : "") : "";
+  const procheType = (style === "sport" || style === "casual") ? (/\blarge\b/.test(tNorm) ? "droit" : /\bdroit/.test(tNorm) ? "large" : "")
+    // Classique droit : les coupes à fentes (cigarette) sont aussi proposées, juste après les droits
+    : (style === "classique" || !style) && /\bdroit/.test(tNorm) ? "fente" : "";
   const scoreType = (p) => keywordScore(p, type) || (procheType ? 0.5 * keywordScore(p, procheType) : 0);
   const rank = (list) =>
     list
@@ -404,6 +406,16 @@ export async function searchCatalog(shopOrigin, args = {}) {
       autres_couleurs_meme_modele: autresCouleurs, autres_modeles_meme_couleur: autresModeles, products: alternatives };
   }
   const similaires = false;
+  // Coupe proche (ex. à fentes pour un classique droit) : on garde 2 modèles de la coupe demandée en tête,
+  // puis on alterne pour que la coupe proche apparaisse aussi dans les cartes
+  if (procheType && !parcourir) {
+    const exacts = found.filter((p) => keywordScore(p, type) > 0), proches = found.filter((p) => !(keywordScore(p, type) > 0));
+    if (exacts.length && proches.length) {
+      const mix = exacts.splice(0, 2);
+      while (exacts.length || proches.length) { if (proches.length) mix.push(proches.shift()); if (exacts.length) mix.push(exacts.shift()); }
+      found = mix;
+    }
+  }
 
   // Sans type précisé (classique/casual/sport) : on mélange les styles pour montrer de la variété
   if (!style && found.length > max) {
