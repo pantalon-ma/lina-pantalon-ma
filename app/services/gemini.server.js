@@ -7,6 +7,7 @@ import { GoogleGenAI } from "@google/genai";
 import AppConfig from "./config.server";
 import systemPrompts from "../prompts/prompts.json";
 import { flowHint } from "./flow.server";
+import { siteKnowledge } from "./site-knowledge.server";
 import { BUTTONS } from "./quick-replies.server";
 
 // Les clics sur les boutons français ne changent pas la langue de la cliente
@@ -123,7 +124,7 @@ export function createGeminiService(apiKey = process.env.GEMINI_API_KEY) {
     const models = [...new Set([AppConfig.api.defaultModel, ...FALLBACK_MODELS])];
     let stream, lastErr;
     const contents = toGeminiContents(messages);
-    const systemInstruction = getSystemPrompt(promptType) + langHint(messages) + flowHint(messages, detectLanguage(messages));
+    const systemInstruction = getSystemPrompt(promptType) + siteKnowledge() + langHint(messages) + flowHint(messages, detectLanguage(messages));
     const geminiTools = toGeminiTools(tools);
     // Gemini refuse un historique qui se termine par un message de Lina
     if (contents.length && contents[contents.length - 1].role === "model") contents.push({ role: "user", parts: [{ text: "..." }] });
