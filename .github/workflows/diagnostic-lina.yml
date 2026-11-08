@@ -1,0 +1,18 @@
+# Test manuel de Lina (envoie 2 messages comme une cliente et affiche la réponse)
+name: Diagnostic Lina
+on: workflow_dispatch
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Message bouton
+        run: |
+          curl -sS -N --max-time 60 -X POST https://lina-pantalon-ma.onrender.com/chat \
+            -H "Origin: https://pantalon.ma" -H "Content-Type: application/json" -H "Accept: text/event-stream" \
+            -d '{"message":"Classique","conversation_id":"diag-'$RANDOM'","prompt_type":"pantalonMa"}' | head -c 3000; echo
+      - name: Question libre (IA)
+        run: |
+          curl -sS -N --max-time 60 -X POST https://lina-pantalon-ma.onrender.com/chat \
+            -H "Origin: https://pantalon.ma" -H "Content-Type: application/json" -H "Accept: text/event-stream" \
+            -d '{"message":"Quels sont les délais de livraison ?","conversation_id":"diag-'$RANDOM'","prompt_type":"pantalonMa"}' | head -c 3000; echo
