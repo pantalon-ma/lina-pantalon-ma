@@ -1,4 +1,4 @@
-# Test manuel de Lina (envoie 2 messages comme une cliente et affiche la réponse)
+# Test manuel de Lina (comme un navigateur : pré-vérification CORS puis message)
 name: Diagnostic Lina
 on: workflow_dispatch
 jobs:
@@ -6,13 +6,16 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 4
     steps:
-      - name: Message bouton
+      - name: Pre-verification CORS (OPTIONS)
         run: |
-          curl -sS -N --max-time 60 -X POST https://lina-pantalon-ma.onrender.com/chat \
-            -H "Origin: https://pantalon.ma" -H "Content-Type: application/json" -H "Accept: text/event-stream" \
-            -d '{"message":"Classique","conversation_id":"diag-'$RANDOM'","prompt_type":"pantalonMa"}' | head -c 3000; echo
-      - name: Question libre (IA)
+          curl -sS -i --max-time 60 -X OPTIONS https://lina-pantalon-ma.onrender.com/chat \
+            -H "Origin: https://pantalon.ma" -H "Access-Control-Request-Method: POST" -H "Access-Control-Request-Headers: content-type" | head -30
+      - name: Message avec en-tetes
         run: |
-          curl -sS -N --max-time 60 -X POST https://lina-pantalon-ma.onrender.com/chat \
+          curl -sS -i -N --max-time 60 -X POST https://lina-pantalon-ma.onrender.com/chat \
             -H "Origin: https://pantalon.ma" -H "Content-Type: application/json" -H "Accept: text/event-stream" \
-            -d '{"message":"Quels sont les délais de livraison ?","conversation_id":"diag-'$RANDOM'","prompt_type":"pantalonMa"}' | head -c 3000; echo
+            -d '{"message":"Test","prompt_type":"pantalonMa"}' | head -c 2500; echo
+      - name: Origin www
+        run: |
+          curl -sS -i --max-time 60 -X OPTIONS https://lina-pantalon-ma.onrender.com/chat \
+            -H "Origin: https://www.pantalon.ma" -H "Access-Control-Request-Method: POST" -H "Access-Control-Request-Headers: content-type" | head -20
