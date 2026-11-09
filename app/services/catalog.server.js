@@ -330,7 +330,9 @@ export async function searchCatalog(shopOrigin, args = {}) {
     // Casual en hiver : peu de modèles chauds → on ajoute le sport (molleton, milano)
     // casual et sport = un seul choix pour la cliente
     const okStyles = style === "casual" || style === "sport" ? ["casual", "sport"] : [style];
-    const sameStyle = all.filter((p) => okStyles.includes(styleOf(p)));
+    // Casual large : les classiques larges (gabardine, simili daim, flanelle drapée…) se portent aussi en casual
+    const casualLarge = okStyles.includes("casual") && /\blarge\b/i.test(String(args.type || ""));
+    const sameStyle = all.filter((p) => okStyles.includes(styleOf(p)) || (casualLarge && styleOf(p) === "classique" && keywordScore(p, "large") > 0));
     if (sameStyle.length) all = sameStyle;
   }
 
